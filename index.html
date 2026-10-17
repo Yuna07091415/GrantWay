@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrantWay - Xalqaro Grantlar & Universitetlar Portali</title>
+  <meta name="description" content="AQSH, Buyuk Britaniya, Germaniya, Yaponiya, Koreya va Yevropa universitetlarida 100% to'liq xalqaro grantlar bazasi, rasmiy arizalar va shaxsiy tayyorgarlik rejasi.">
+  
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       Telegram-Style Language Modal (Foydalanuvchi birinchi kirganda yoki til tugmasini bosganda)
+       ========================================================================== -->
+  <div class="telegram-modal-overlay" id="telegramLangModal">
+    <div class="telegram-modal-card">
+      <div class="telegram-icon-badge">🌐</div>
+      <h2 class="telegram-modal-title" data-i18n="welcomeTitle">GrantWay portaliga xush kelibsiz!</h2>
+      <p class="telegram-modal-subtitle" data-i18n="welcomeSubtitle">Davom etish uchun o'zingizga qulay tilni tanlang (Telegramdagidek)</p>
+
+      <div class="telegram-lang-list">
+        <!-- O'zbek tili -->
+        <button type="button" class="lang-select-btn" data-lang="uz" onclick="setLanguage('uz')">
+          <div class="lang-info">
+            <span class="lang-flag">🇺🇿</span>
+            <div>
+              <div class="lang-native-name">O'zbekcha</div>
+              <div class="lang-sub-name">O'zbek tili (Lotin)</div>
+            </div>
+          </div>
+          <div class="lang-check-radio"></div>
+        </button>
+
+        <!-- English -->
+        <button type="button" class="lang-select-btn" data-lang="en" onclick="setLanguage('en')">
+          <div class="lang-info">
+            <span class="lang-flag">🇬🇧</span>
+            <div>
+              <div class="lang-native-name">English</div>
+              <div class="lang-sub-name">International English</div>
+            </div>
+          </div>
+          <div class="lang-check-radio"></div>
+        </button>
+
+        <!-- Русский -->
+        <button type="button" class="lang-select-btn" data-lang="ru" onclick="setLanguage('ru')">
+          <div class="lang-info">
+            <span class="lang-flag">🇷🇺</span>
+            <div>
+              <div class="lang-native-name">Русский</div>
+              <div class="lang-sub-name">Русский язык</div>
+            </div>
+          </div>
+          <div class="lang-check-radio"></div>
+        </button>
+      </div>
+
+      <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 1.25rem;" data-i18n="chooseLangPrompt">
+        Istalgan vaqtda tilni yuqori menyudan o'zgartirishingiz mumkin.
+      </p>
+
+      <button type="button" class="btn btn-primary w-full" style="width: 100%;" onclick="closeTelegramLangModal()" data-i18n="continueBtn">
+        Davom etish
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Site Header / Navigation
+       ========================================================================== -->
+  <header class="site-header">
+    <div class="container nav-wrapper">
+      <a href="#" class="brand-logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+        </svg>
+        <span class="brand-title" data-i18n="brandName">GrantWay</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="nav-menu" id="mainNavLinks">
+        <a href="#grants" class="nav-link" data-i18n="navGrants">Grantlar</a>
+        <a href="#universities" class="nav-link" data-i18n="navUniversities">Universitetlar</a>
+        <a href="#planner" class="nav-link">
+          <span data-i18n="navPlanner">Ariza Rejasi</span>
+          <span class="nav-badge planner-count-badge" style="display: none;">0</span>
+        </a>
+        <a href="#matcher" class="nav-link" data-i18n="navMatcher">Moslik Kalkulyatori</a>
+        <a href="#guides" class="nav-link" data-i18n="navGuides">Qo'llanmalar</a>
+      </nav>
+
+      <!-- Nav Actions (Til tanlash & Mobile toggle) -->
+      <div class="nav-actions">
+        <button type="button" class="lang-btn" id="currentLangLabel" onclick="showTelegramLangModal()">
+          <span class="flag">🇺🇿</span> O'zbekcha
+        </button>
+
+        <button type="button" class="mobile-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==========================================================================
+         Hero Section
+         ========================================================================== -->
+    <section class="hero-section text-center">
+      <div class="container">
+        <div class="hero-badge-wrap animate-fade-in">
+          <span data-i18n="heroBadge">🌍 2024-2025 Yillik Xalqaro Grantlar Bazasi</span>
+        </div>
+
+        <h1 class="hero-title animate-fade-in" data-i18n="heroTitle">
+          Orzuingizdagi ta'lim va 100% to'liq grantlarni toping
+        </h1>
+
+        <p class="hero-desc animate-fade-in" data-i18n="heroDesc">
+          AQSH, Buyuk Britaniya, Germaniya, Yaponiya, Koreya va Yevropaning yetakchi universitetlarida bepul o'qish imkoniyati. Rasmiy manbalar, aniq muddatlar va shaxsiy tayyorgarlik rejasi.
+        </p>
+
+        <!-- Qidiruv paneli -->
+        <div class="hero-search-box animate-fade-in">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="globalSearchInput" class="search-input" data-i18n-placeholder="heroSearchPlaceholder" placeholder="Grant nomi, universitet, davlat yoki soha bo'yicha qidiring...">
+          </div>
+        </div>
+
+        <!-- Statistika ko'rsatkichlari -->
+        <div class="hero-stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">500+</div>
+            <div class="stat-label" data-i18n="statsGrants">Faol xalqaro grantlar</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">45+</div>
+            <div class="stat-label" data-i18n="statsCountries">Davlatlar qamrovi</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">100%</div>
+            <div class="stat-label" data-i18n="statsScholarships">To'liq qoplovchi stipendiyalar</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">12,000+</div>
+            <div class="stat-label" data-i18n="statsSuccess">Muvaffaqiyatli arizachilar</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Filter Panel Section
+         ========================================================================== -->
+    <section class="filter-panel-section" id="filterSection">
+      <div class="container">
+        <div class="filter-controls-grid">
+          <!-- Mamlakat -->
+          <div class="filter-group">
+            <label class="filter-label" data-i18n="filterCountry">Mamlakat</label>
+            <select id="filterCountrySelect" class="custom-select">
+              <option value="ALL" data-i18n="filterCountryAll">Barcha mamlakatlar</option>
+            </select>
+          </div>
+
+          <!-- Ta'lim darajasi -->
+          <div class="filter-group">
+            <label class="filter-label" data-i18n="filterDegree">Ta'lim darajasi</label>
+            <select id="filterDegreeSelect" class="custom-select">
+              <option value="all" data-i18n="filterDegreeAll">Barcha darajalar</option>
+              <option value="bachelor" data-i18n="degreeBachelor">Bakalavriat</option>
+              <option value="master" data-i18n="degreeMaster">Magistratura</option>
+              <option value="phd" data-i18n="degreePhD">Doktorantura (PhD)</option>
+              <option value="exchange" data-i18n="degreeExchange">Almashinuv dasturi / Kurs</option>
+            </select>
+          </div>
+
+          <!-- Yo'nalish -->
+          <div class="filter-group">
+            <label class="filter-label" data-i18n="filterField">Yo'nalish / Soha</label>
+            <select id="filterFieldSelect" class="custom-select">
+              <option value="all" data-i18n="filterFieldAll">Barcha yo'nalishlar</option>
+              <option value="it" data-i18n="fieldIT">IT, AI & Muhandislik (STEM)</option>
+              <option value="business" data-i18n="fieldBusiness">Biznes, Moliya & Iqtisodiyot</option>
+              <option value="medicine" data-i18n="fieldMedicine">Tibbiyot & Salomatlik</option>
+              <option value="social" data-i18n="fieldSocial">Ijtimoiy fanlar & Huquq</option>
+              <option value="arts" data-i18n="fieldArts">San'at, Dizayn & Arxitektura</option>
+            </select>
+          </div>
+
+          <!-- Moliyalashtirish -->
+          <div class="filter-group">
+            <label class="filter-label" data-i18n="filterFunding">Moliyalashtirish</label>
+            <select id="filterFundingSelect" class="custom-select">
+              <option value="all" data-i18n="filterFundingAll">Barcha turlar</option>
+              <option value="full" data-i18n="fundingFull">To'liq grant (Full Ride / 100%)</option>
+              <option value="partial" data-i18n="fundingPartial">Qisman grant (Tuition waiver)</option>
+            </select>
+          </div>
+
+          <!-- Til talabi -->
+          <div class="filter-group">
+            <label class="filter-label" data-i18n="filterLanguageReq">Til talabi</label>
+            <select id="filterLangReqSelect" class="custom-select">
+              <option value="all" data-i18n="filterLanguageReqAll">Barcha talablar</option>
+              <option value="no_ielts" data-i18n="reqNoIelts">IELTS talab qilinmaydi</option>
+              <option value="ielts" data-i18n="reqIelts">IELTS / TOEFL talab qilinadi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Filter Bottom Bar (Natijalar soni va Saralash) -->
+        <div class="filter-bottom-bar">
+          <div class="filter-results-info">
+            <span class="results-badge" id="resultsCountBadge">8 topildi</span>
+          </div>
+
+          <div class="filter-actions">
+            <div class="sort-wrapper">
+              <span data-i18n="sortBy">Saralash:</span>
+              <select id="sortBySelect" class="custom-select" style="width: auto; padding: 0.4rem 0.75rem;">
+                <option value="deadline_soon" data-i18n="sortDeadlineSoon">Deadline: eng yaqini avval</option>
+                <option value="deadline_late" data-i18n="sortDeadlineLate">Deadline: kechroq</option>
+                <option value="name_asc" data-i18n="sortNameAsc">Nomi: A - Z</option>
+                <option value="popular" data-i18n="sortPopular">Mashhurlik bo'yicha</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-outline btn-sm" onclick="resetAllFilters()" data-i18n="resetFilters">
+              Filtrlarni tozalash
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Scholarships Cards Section
+         ========================================================================== -->
+    <section class="scholarships-section" id="grants">
+      <div class="container">
+        <div class="section-header-block">
+          <h2 class="section-title" data-i18n="navGrants">Xalqaro Grantlar</h2>
+          <p class="section-subtitle" data-i18n="heroDesc">
+            Dunyoning eng nufuzli to'liq moliyalashtiriladigan grant dasturlari
+          </p>
+        </div>
+
+        <!-- Grantlar ro'yxati -->
+        <div class="scholarships-grid" id="scholarshipsGrid">
+          <!-- Dinamik ravishda JS orqali to'ldiriladi -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Personal Application Planner (Roadmap & Checklist)
+         ========================================================================== -->
+    <section class="planner-section" id="planner">
+      <div class="container">
+        <div class="planner-header-bar">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <h2 class="section-title" data-i18n="plannerTitle">Shaxsiy Ariza Rejasi & Yo'l Xaritasi</h2>
+              <span class="results-badge text-emerald" id="overallPlannerProgress" style="font-size: 0.95rem;">0%</span>
+            </div>
+            <p class="section-subtitle" data-i18n="plannerSubtitle">
+              Tanlagan grantlaringiz bo'yicha bosqichma-bosqich harakat rejasi, hujjatlar nazorati va deadline eslatmalari.
+            </p>
+          </div>
+
+          <div class="planner-tools-wrap">
+            <button class="btn btn-outline btn-sm" onclick="printPlanner()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span data-i18n="printPlan">Chop etish / PDF</span>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="exportPlannerJSON()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span data-i18n="exportPlan">Eksport (JSON)</span>
+            </button>
+            <button class="btn btn-outline btn-sm text-rose" onclick="clearPlanner()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span data-i18n="clearPlanner">Tozalash</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bo'sh holat (Empty State) -->
+        <div class="planner-empty-state" id="plannerEmptyState">
+          <div class="empty-icon">📌</div>
+          <h3 data-i18n="plannerEmptyTitle">Hozircha rejangiz bo'sh</h3>
+          <p class="text-muted" style="margin-top: 0.5rem; margin-bottom: 1.5rem;" data-i18n="plannerEmptyDesc">
+            Grantlar ro'yxatidan o'zingizga yoqqanlarini 'Rejaga qo'shish' tugmasi orqali bu yerga kiriting.
+          </p>
+          <a href="#grants" class="btn btn-primary" data-i18n="navGrants">Grantlarni ko'rish</a>
+        </div>
+
+        <!-- Planner kontenti -->
+        <div id="plannerContentArea" style="display: none;">
+          <div id="plannerItemsContainer">
+            <!-- Tanlangan grantlar JS orqali to'ldiriladi -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Eligibility Matcher (Quiz) Section
+         ========================================================================== -->
+    <section class="matcher-section" id="matcher">
+      <div class="container">
+        <div class="text-center" style="margin-bottom: 2.5rem;">
+          <h2 class="section-title" data-i18n="matcherTitle">Grant Moslik Kalkulyatori</h2>
+          <p class="section-subtitle" data-i18n="matcherSubtitle">
+            O'z parametrlaringizni kiriting va sizga 100% mos keladigan grantlarni bir zumda aniqlang!
+          </p>
+        </div>
+
+        <div class="matcher-card-box">
+          <div class="matcher-form-grid">
+            <!-- Step 1: Degree -->
+            <div class="matcher-group">
+              <label class="filter-label" data-i18n="quizStep1">1. Ta'lim darajangizni tanlang</label>
+              <select id="matcherDegree" class="custom-select">
+                <option value="any">Istalgan daraja</option>
+                <option value="bachelor">Bakalavriat</option>
+                <option value="master" selected>Magistratura</option>
+                <option value="phd">Doktorantura (PhD)</option>
+                <option value="exchange">Almashinuv dasturi</option>
+              </select>
+            </div>
+
+            <!-- Step 2: Field -->
+            <div class="matcher-group">
+              <label class="filter-label" data-i18n="quizStep2">2. Yo'nalishingizni tanlang</label>
+              <select id="matcherField" class="custom-select">
+                <option value="any">Barcha sohalarga ochiq</option>
+                <option value="it" selected>IT, AI & Muhandislik (STEM)</option>
+                <option value="business">Biznes, Moliya & Iqtisodiyot</option>
+                <option value="medicine">Tibbiyot & Sog'liqni saqlash</option>
+                <option value="social">Ijtimoiy fanlar & Huquq</option>
+                <option value="arts">San'at & Gumanitar</option>
+              </select>
+            </div>
+
+            <!-- Step 3: English -->
+            <div class="matcher-group">
+              <label class="filter-label" data-i18n="quizStep3">3. Ingliz tili darajangiz</label>
+              <select id="matcherEnglish" class="custom-select">
+                <option value="no_ielts">IELTS yo'q (yoki boshlang'ich)</option>
+                <option value="ielts_mid">IELTS 6.0 - 6.5 (yoki TOEFL 80+)</option>
+                <option value="ielts_high" selected>IELTS 7.0+ (yoki TOEFL 100+)</option>
+              </select>
+            </div>
+
+            <!-- Step 4: GPA -->
+            <div class="matcher-group">
+              <label class="filter-label" data-i18n="quizStep4">4. Baholaringiz (GPA)</label>
+              <select id="matcherGpa" class="custom-select">
+                <option value="gpa_low">GPA < 3.0 (70% dan past)</option>
+                <option value="gpa_mid">GPA 3.0 - 3.5 (75% - 85%)</option>
+                <option value="gpa_high" selected>GPA 3.5+ (85% dan yuqori / Qizil diplom)</option>
+              </select>
+            </div>
+
+            <!-- Step 5: Region -->
+            <div class="matcher-group full-width">
+              <label class="filter-label" data-i18n="quizStep5">5. Qiziqqan hududingiz</label>
+              <select id="matcherRegion" class="custom-select">
+                <option value="any" selected>Dunyoning barcha mamlakatlari</option>
+                <option value="eu">Yevropa (Germaniya, Vengriya, Shvetsiya, EU)</option>
+                <option value="uk">Buyuk Britaniya (Chevening, Oxford, Cambridge)</option>
+                <option value="us">AQSH (Fulbright, Global UGRAD, Ivy League)</option>
+                <option value="asia">Sharqiy Osiyo (Janubiy Koreya, Yaponiya, Turkiya)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="button" class="btn btn-primary btn-lg" onclick="runEligibilityMatcher()">
+              <span>✨</span>
+              <span data-i18n="quizFindMatches">Menga mos grantlarni topish</span>
+            </button>
+          </div>
+
+          <!-- Natijalar bloki -->
+          <div class="matcher-results-card" id="matcherResultsCard" style="display: none;">
+            <h3 class="matcher-results-title" data-i18n="quizResultsTitle">Sizga mos keluvchi grantlar:</h3>
+            <div class="matcher-results-grid" id="matcherResultsContainer">
+              <!-- Natijalar JS orqali to'ldiriladi -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Universities Section
+         ========================================================================== -->
+    <section class="universities-section" id="universities">
+      <div class="container">
+        <div class="text-center" style="margin-bottom: 2.5rem;">
+          <h2 class="section-title" data-i18n="uniTitle">Dunyoning Yetakchi Universitetlari</h2>
+          <p class="section-subtitle" data-i18n="uniSubtitle">
+            QS World University Rankings bo'yicha eng nufuzli oliygohlar va ularning qabul imkoniyatlari.
+          </p>
+        </div>
+
+        <!-- Universitetlar qidiruvi -->
+        <div class="uni-search-bar">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="uniSearchInput" class="search-input" data-i18n-placeholder="uniSearchPlaceholder" placeholder="Universitet nomi yoki mamlakat...">
+          </div>
+        </div>
+
+        <div class="universities-grid" id="universitiesGrid">
+          <!-- JS orqali render qilinadi -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Guides & Tips Section
+         ========================================================================== -->
+    <section class="guides-section" id="guides">
+      <div class="container">
+        <div class="section-header-block">
+          <h2 class="section-title" data-i18n="guidesTitle">Muvaffaqiyatli Ariza Qo'llanmasi</h2>
+          <p class="section-subtitle" data-i18n="guidesSubtitle">
+            Grant yutib olish sirlari, xatolar tahlili va professional maslahatlar.
+          </p>
+        </div>
+
+        <div class="guides-grid">
+          <!-- Guide 1: SOP -->
+          <div class="guide-card" onclick="openGuideModal('sop')">
+            <div class="guide-icon">✍️</div>
+            <h3 class="guide-title" data-i18n="guide1Title">Kuchsiz Motivatsiya Xatini Qanday Kuchaytirsa Bo'ladi?</h3>
+            <p class="guide-desc" data-i18n="guide1Desc">Qabul komissiyasi sizning xatingizdan nimani kutadi? 5 ta oltin qoida va real misollar.</p>
+            <span class="guide-link"><span data-i18n="readGuide">Qo'llanmani o'qish</span> →</span>
+          </div>
+
+          <!-- Guide 2: LoR -->
+          <div class="guide-card" onclick="openGuideModal('lor')">
+            <div class="guide-icon">📜</div>
+            <h3 class="guide-title" data-i18n="guide2Title">Kuchli Tavsiyanoma (LoR) Olish Sir-Asrorlari</h3>
+            <p class="guide-desc" data-i18n="guide2Desc">Professor yoki ish beruvchidan esda qolarli tavsiya olish uchun tavsiyalar.</p>
+            <span class="guide-link"><span data-i18n="readGuide">Qo'llanmani o'qish</span> →</span>
+          </div>
+
+          <!-- Guide 3: CV -->
+          <div class="guide-card" onclick="openGuideModal('cv')">
+            <div class="guide-icon">💼</div>
+            <h3 class="guide-title" data-i18n="guide3Title">Xalqaro CV va Resume Tayyorlash Standartlari</h3>
+            <p class="guide-desc" data-i18n="guide3Desc">Yevropa Europass va AQSH formatidagi mukammal akademik rezyume tuzilmasi.</p>
+            <span class="guide-link"><span data-i18n="readGuide">Qo'llanmani o'qish</span> →</span>
+          </div>
+
+          <!-- Guide 4: Interview -->
+          <div class="guide-card" onclick="openGuideModal('interview')">
+            <div class="guide-icon">🎙️</div>
+            <h3 class="guide-title" data-i18n="guide4Title">Elchixona va Universitet Intervyusidan Qanday O'tish Kerak?</h3>
+            <p class="guide-desc" data-i18n="guide4Desc">Eng ko'p beriladigan 10 ta savol va ularga qanday to'g'ri javob berish strategiyasi.</p>
+            <span class="guide-link"><span data-i18n="readGuide">Qo'llanmani o'qish</span> →</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       Grant Details Modal
+       ========================================================================== -->
+  <div class="grant-modal-overlay" id="grantDetailModal">
+    <div class="grant-modal-box">
+      <div class="grant-modal-header">
+        <div>
+          <div class="modal-country-badge">
+            <span id="modalFlag" style="font-size: 1.3rem;"></span>
+            <span id="modalCountry" class="font-semibold"></span> •
+            <span id="modalOrganizer" class="text-dim"></span>
+          </div>
+          <h2 class="grant-modal-title" id="modalTitle"></h2>
+        </div>
+        <button class="btn-icon" onclick="closeGrantModal()" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="grant-modal-body">
+        <!-- Umumiy parametrlar -->
+        <div class="modal-overview-grid">
+          <div class="modal-info-item">
+            <span class="modal-info-label" data-i18n="grantDeadline">Deadline</span>
+            <span id="modalDeadlineVal"></span>
+          </div>
+          <div class="modal-info-item">
+            <span class="modal-info-label" data-i18n="modalDegree">Ta'lim darajasi</span>
+            <span id="modalDegreeVal" class="font-semibold"></span>
+          </div>
+          <div class="modal-info-item">
+            <span class="modal-info-label" data-i18n="modalFundingCoverage">Moliyaviy qamrov</span>
+            <span id="modalFundingVal" class="text-emerald font-semibold"></span>
+          </div>
+          <div class="modal-info-item">
+            <span class="modal-info-label" data-i18n="modalLanguageReqs">Til talabi</span>
+            <span id="modalIeltsVal" class="font-semibold"></span>
+          </div>
+          <div class="modal-info-item">
+            <span class="modal-info-label" data-i18n="modalGPA">Minimal GPA</span>
+            <span id="modalGpaVal" class="font-semibold"></span>
+          </div>
+        </div>
+
+        <!-- Tavsif -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>ℹ️</span> <span data-i18n="modalOverview">Umumiy ma'lumot</span>
+          </h3>
+          <p id="modalOverviewText" style="color: var(--text-muted); line-height: 1.7;"></p>
+        </div>
+
+        <!-- Imtiyozlar -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>🎁</span> <span data-i18n="modalBenefits">Grant nimani o'z ichiga oladi?</span>
+          </h3>
+          <ul class="modal-list" id="modalBenefitsList"></ul>
+        </div>
+
+        <!-- Talablar -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>📋</span> <span data-i18n="modalRequirements">Nomzodga qo'yiladigan talablar</span>
+          </h3>
+          <ul class="modal-list" id="modalRequirementsList"></ul>
+        </div>
+
+        <!-- Hujjatlar ro'yxati (Interactive checklist) -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>📁</span> <span data-i18n="modalDocuments">Kerakli hujjatlar ro'yxati (Checklist)</span>
+          </h3>
+          <ul class="modal-list" id="modalDocumentsList"></ul>
+        </div>
+
+        <!-- Eslatmalar & Maslahatlar -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>💡</span> <span data-i18n="modalTips">Muhim eslatmalar va maslahatlar</span>
+          </h3>
+          <ul class="modal-list" id="modalTipsList"></ul>
+        </div>
+      </div>
+
+      <div class="grant-modal-footer">
+        <button class="btn btn-outline" id="modalReminderBtn" onclick="setDeadlineReminder()">
+          <span>🔔</span>
+          <span>Deadline eslatmasi</span>
+        </button>
+
+        <div class="modal-footer-actions">
+          <button class="btn btn-outline" id="modalPlannerBtn">
+            + Ariza rejasiga qo'shish
+          </button>
+          <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" id="modalOfficialLinkBtn">
+            Rasmiy veb-saytda ariza topshirish ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Guides Detail Modal
+       ========================================================================== -->
+  <div class="grant-modal-overlay" id="guideDetailModal">
+    <div class="grant-modal-box" style="max-width: 720px;">
+      <div class="grant-modal-header">
+        <h2 class="grant-modal-title" id="guideModalTitle"></h2>
+        <button class="btn-icon" onclick="closeGuideModal()" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="grant-modal-body" id="guideModalBody" style="line-height: 1.8;">
+        <!-- JS orqali to'ldiriladi -->
+      </div>
+      <div class="grant-modal-footer" style="justify-content: flex-end;">
+        <button class="btn btn-primary" onclick="closeGuideModal()" data-i18n="closeModal">Yopish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Site Footer
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="brand-logo" style="margin-bottom: 0.75rem;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+            <span class="brand-title" data-i18n="brandName">GrantWay</span>
+          </a>
+          <p data-i18n="footerDesc">
+            GrantWay — dunyo bo'ylab talabalar uchun bepul, xolis va zamonaviy grant qidiruv platformasi. Barcha ma'lumotlar rasmiy elchixonalar va universitet saytlaridan olingan.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4 data-i18n="footerLinks">Foydali havolalar</h4>
+          <ul class="footer-links">
+            <li><a href="#grants" data-i18n="navGrants">Grantlar</a></li>
+            <li><a href="#universities" data-i18n="navUniversities">Universitetlar</a></li>
+            <li><a href="#planner" data-i18n="navPlanner">Ariza Rejasi</a></li>
+            <li><a href="#matcher" data-i18n="navMatcher">Moslik Kalkulyatori</a></li>
+            <li><a href="#guides" data-i18n="navGuides">Qo'llanmalar</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 data-i18n="footerContact">Rasmiy Manbalar</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.chevening.org/" target="_blank" rel="noopener">Chevening UK</a></li>
+            <li><a href="https://www.daad.de/" target="_blank" rel="noopener">DAAD Germany</a></li>
+            <li><a href="https://foreign.fulbrightonline.org/" target="_blank" rel="noopener">Fulbright USA</a></li>
+            <li><a href="https://www.turkiyeburslari.gov.tr/" target="_blank" rel="noopener">Türkiye Bursları</a></li>
+            <li><a href="https://eyuf.uz/" target="_blank" rel="noopener">El-Yurt Umidi</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2024-2025 GrantWay. <span data-i18n="rightsReserved">Barcha huquqlar himoyalangan.</span>
+        </div>
+        <div style="font-size: 0.8rem;" data-i18n="footerDisclaimer">
+          Saytdagi barcha muddatlar va talablar rasmiy manbalar bilan muntazam yangilanadi. Hujjat topshirishdan oldin rasmiy sayt bilan tekshiring.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/translations.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/language.js"></script>
+  <script src="js/planner.js"></script>
+  <script src="js/matcher.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
