@@ -21,16 +21,14 @@ function togglePlannerItem(scholarshipId) {
   const grant = scholarshipsData.find(s => s.id === scholarshipId);
   if (!grant) return;
 
+  const t = translations[currentLang] || translations.en || translations.uz;
+  const grantTitle = getLangText(grant.title);
+
   if (planner[scholarshipId]) {
     // Rejadan olib tashlash
     delete planner[scholarshipId];
     savePlannerData(planner);
-    showToast(
-      currentLang === 'uz' ? `"${grant.title[currentLang]}" rejadan olib tashlandi` :
-      currentLang === 'ru' ? `"${grant.title[currentLang]}" удалено из плана` :
-      `"${grant.title[currentLang]}" removed from planner`,
-      'info'
-    );
+    showToast(`"${grantTitle}" - ${t.clearPlanner}`, 'info');
   } else {
     // Rejaga qo'shish
     planner[scholarshipId] = {
@@ -45,12 +43,7 @@ function togglePlannerItem(scholarshipId) {
       }
     };
     savePlannerData(planner);
-    showToast(
-      currentLang === 'uz' ? `"${grant.title[currentLang]}" shaxsiy rejangizga qo'shildi! 📋` :
-      currentLang === 'ru' ? `"${grant.title[currentLang]}" добавлено в ваш план! 📋` :
-      `"${grant.title[currentLang]}" added to your planner! 📋`,
-      'success'
-    );
+    showToast(`"${grantTitle}" - ${t.inPlanner} 📋`, 'success');
   }
 
   // Sahifadagi tugmalar va ro'yxatni yangilash
@@ -73,6 +66,7 @@ function updatePlannerBadge() {
 function updatePlannerButtons() {
   const planner = getPlannerData();
   const buttons = document.querySelectorAll('[data-planner-btn]');
+  const t = translations[currentLang] || translations.en || translations.uz;
   
   buttons.forEach(btn => {
     const id = btn.getAttribute('data-planner-btn');
@@ -82,13 +76,13 @@ function updatePlannerButtons() {
       btn.classList.add('in-planner');
       btn.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>${translations[currentLang].inPlanner}</span>
+        <span>${t.inPlanner}</span>
       `;
     } else {
       btn.classList.remove('in-planner');
       btn.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-        <span>${translations[currentLang].addToPlanner}</span>
+        <span>${t.addToPlanner}</span>
       `;
     }
   });
@@ -99,6 +93,7 @@ function renderPlanner() {
   const container = document.getElementById('plannerItemsContainer');
   if (!container) return;
 
+  const t = translations[currentLang] || translations.en || translations.uz;
   const planner = getPlannerData();
   const grantIds = Object.keys(planner);
   const emptyState = document.getElementById('plannerEmptyState');
@@ -134,17 +129,20 @@ function renderPlanner() {
     // Deadline hisobi
     const daysLeft = calculateDaysLeft(grant.deadline);
     let deadlineBadgeClass = 'badge-active';
-    let deadlineText = `${daysLeft} ${translations[currentLang].grantDaysLeft}`;
+    let deadlineText = `${daysLeft} ${t.grantDaysLeft}`;
 
     if (daysLeft < 0) {
       deadlineBadgeClass = 'badge-expired';
-      deadlineText = translations[currentLang].grantDeadlinePassed;
+      deadlineText = t.grantDeadlinePassed;
     } else if (daysLeft === 0) {
       deadlineBadgeClass = 'badge-urgent';
-      deadlineText = translations[currentLang].grantToday;
+      deadlineText = t.grantToday;
     } else if (daysLeft <= 14) {
       deadlineBadgeClass = 'badge-urgent';
     }
+
+    const grantTitle = getLangText(grant.title);
+    const countryName = getLangText(grant.countryName);
 
     html += `
       <div class="planner-card" data-card-id="${grant.id}">
@@ -152,8 +150,8 @@ function renderPlanner() {
           <div class="planner-card-info">
             <span class="flag-icon">${grant.flag}</span>
             <div>
-              <h3 class="planner-card-title">${grant.title[currentLang]}</h3>
-              <p class="planner-card-meta">${grant.organizer} • ${grant.countryName[currentLang]}</p>
+              <h3 class="planner-card-title">${grantTitle}</h3>
+              <p class="planner-card-meta">${grant.organizer} • ${countryName}</p>
             </div>
           </div>
           <div class="planner-card-actions">
@@ -166,7 +164,7 @@ function renderPlanner() {
 
         <div class="planner-progress-wrapper">
           <div class="progress-info">
-            <span class="progress-title">${translations[currentLang].plannerProgress}</span>
+            <span class="progress-title">${t.plannerProgress}</span>
             <span class="progress-percent font-bold">${progressPercent}%</span>
           </div>
           <div class="progress-bar-bg">
@@ -180,8 +178,8 @@ function renderPlanner() {
             <input type="checkbox" ${steps.step1 ? 'checked' : ''} onchange="toggleStep('${grant.id}', 'step1')">
             <span class="custom-checkbox"></span>
             <div class="step-label">
-              <strong>${translations[currentLang].step1Title}</strong>
-              <small>${currentLang === 'uz' ? "Yo'nalish va OTMni tanlash, qabul mezonlari bilan to'liq tanishib chiqish." : currentLang === 'ru' ? "Выбор программы и детальное изучение требований." : "Review course catalog, eligibility, and program regulations."}</small>
+              <strong>${t.step1Title}</strong>
+              <small>Review course catalog, eligibility, and program regulations.</small>
             </div>
           </label>
 
@@ -189,8 +187,8 @@ function renderPlanner() {
             <input type="checkbox" ${steps.step2 ? 'checked' : ''} onchange="toggleStep('${grant.id}', 'step2')">
             <span class="custom-checkbox"></span>
             <div class="step-label">
-              <strong>${translations[currentLang].step2Title}</strong>
-              <small>${currentLang === 'uz' ? "Diplom/Attestatni ingliz tiliga tarjima qildirish, notarial tasdiqlash va apostil." : currentLang === 'ru' ? "Перевод диплома/аттестата, нотариальное заверение и апостиль." : "Translate academic diploma/transcript and get notarized/apostilled."}</small>
+              <strong>${t.step2Title}</strong>
+              <small>Translate academic diploma/transcript and get notarized/apostilled.</small>
             </div>
           </label>
 
@@ -198,7 +196,7 @@ function renderPlanner() {
             <input type="checkbox" ${steps.step3 ? 'checked' : ''} onchange="toggleStep('${grant.id}', 'step3')">
             <span class="custom-checkbox"></span>
             <div class="step-label">
-              <strong>${translations[currentLang].step3Title}</strong>
+              <strong>${t.step3Title}</strong>
               <small>${grant.ieltsReq}</small>
             </div>
           </label>
@@ -207,8 +205,8 @@ function renderPlanner() {
             <input type="checkbox" ${steps.step4 ? 'checked' : ''} onchange="toggleStep('${grant.id}', 'step4')">
             <span class="custom-checkbox"></span>
             <div class="step-label">
-              <strong>${translations[currentLang].step4Title}</strong>
-              <small>${currentLang === 'uz' ? "Kuchli Statement of Purpose yozish va professorlardan 2 ta tavsiyanoma olish." : currentLang === 'ru' ? "Написание мотивационного эссе и получение рекомендаций от профессоров." : "Draft high-impact Statement of Purpose and secure 2 recommendation letters."}</small>
+              <strong>${t.step4Title}</strong>
+              <small>Draft high-impact Statement of Purpose (SOP) and secure 2 recommendation letters.</small>
             </div>
           </label>
 
@@ -216,22 +214,22 @@ function renderPlanner() {
             <input type="checkbox" ${steps.step5 ? 'checked' : ''} onchange="toggleStep('${grant.id}', 'step5')">
             <span class="custom-checkbox"></span>
             <div class="step-label">
-              <strong>${translations[currentLang].step5Title}</strong>
-              <small>${currentLang === 'uz' ? "Rasmiy portalda anketani to'ldirib, arizani muddatidan oldin jo'natish." : currentLang === 'ru' ? "Заполнение формы на официальном портале и финальная отправка заявки." : "Final online form submission on official scholarship portal before deadline."}</small>
+              <strong>${t.step5Title}</strong>
+              <small>Final online form submission on official scholarship portal before deadline.</small>
             </div>
           </label>
         </div>
 
         <!-- Shaxsiy Qaydlar (Notes) -->
         <div class="planner-notes-section">
-          <textarea class="planner-notes-input" id="notes-${grant.id}" placeholder="${translations[currentLang].notesPlaceholder}">${item.notes || ''}</textarea>
+          <textarea class="planner-notes-input" id="notes-${grant.id}" placeholder="${t.notesPlaceholder}">${item.notes || ''}</textarea>
           <div class="notes-footer">
             <button class="btn btn-sm btn-outline" onclick="saveGrantNotes('${grant.id}')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-              ${translations[currentLang].saveNotes}
+              ${t.saveNotes}
             </button>
             <a href="${grant.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">
-              ${translations[currentLang].officialLink} ↗
+              ${t.officialLink} ↗
             </a>
           </div>
         </div>
@@ -270,12 +268,8 @@ function saveGrantNotes(grantId) {
   if (textarea) {
     planner[grantId].notes = textarea.value;
     savePlannerData(planner);
-    showToast(
-      currentLang === 'uz' ? "Qaydlaringiz muvaffaqiyatli saqlandi! 💾" :
-      currentLang === 'ru' ? "Заметка сохранена! 💾" :
-      "Notes saved successfully! 💾",
-      'success'
-    );
+    const t = translations[currentLang] || translations.en || translations.uz;
+    showToast(t.saveNotes + " ✓", 'success');
   }
 }
 
@@ -300,21 +294,13 @@ function printPlanner() {
 
 // Barcha rejani tozalash
 function clearPlanner() {
-  const confirmMsg = currentLang === 'uz' ? "Haqiqatan ham barcha shaxsiy rejalaringizni o'chirib tashlamoqchimisiz?" :
-    currentLang === 'ru' ? "Вы действительно хотите очистить весь личный план?" :
-    "Are you sure you want to clear your entire application plan?";
-
-  if (confirm(confirmMsg)) {
+  const t = translations[currentLang] || translations.en || translations.uz;
+  if (confirm(t.clearPlanner + "?")) {
     localStorage.removeItem(PLANNER_STORAGE_KEY);
     renderPlanner();
     updatePlannerBadge();
     updatePlannerButtons();
-    showToast(
-      currentLang === 'uz' ? "Reja tozalandi." :
-      currentLang === 'ru' ? "План очищен." :
-      "Planner cleared.",
-      'info'
-    );
+    showToast(t.clearPlanner, 'info');
   }
 }
 

@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
   updatePlannerBadge();
 });
 
+// Yordamchi: joriy til lug'ati
+function getT() {
+  return translations[currentLang] || translations.en || translations.uz;
+}
+
 // Hodisalarni sozlash (Event Listeners)
 function setupEventListeners() {
   // Qidiruv inputi (real-time debounced)
@@ -32,6 +37,14 @@ function setupEventListeners() {
     searchInput.addEventListener('input', (e) => {
       activeFilters.search = e.target.value.trim().toLowerCase();
       renderScholarships();
+    });
+  }
+
+  // Telegram modalidagi til qidiruvi
+  const langSearchInput = document.getElementById('langSearchInput');
+  if (langSearchInput) {
+    langSearchInput.addEventListener('input', (e) => {
+      renderTelegramLangList(e.target.value);
     });
   }
 
@@ -122,7 +135,7 @@ function updateFilterCountryOptions() {
   countriesList.forEach(c => {
     const opt = document.createElement('option');
     opt.value = c.code;
-    opt.textContent = c.name[currentLang] || c.name.uz;
+    opt.textContent = getLangText(c.name);
     if (c.code === savedVal) opt.selected = true;
     select.appendChild(opt);
   });
@@ -162,12 +175,7 @@ function resetAllFilters() {
   if (sortSelect) sortSelect.value = 'deadline_soon';
 
   renderScholarships();
-  showToast(
-    currentLang === 'uz' ? "Filtrlar tozalandi" :
-    currentLang === 'ru' ? "Фильтры сброшены" :
-    "Filters reset",
-    'info'
-  );
+  showToast(getT().resetFilters, 'info');
 }
 
 // Grantlarni qidirish va filtrlash
@@ -176,13 +184,13 @@ function getFilteredScholarships() {
     // 1. Qidiruv matni (Nomi, mamlakati, tashkilotchi, tavsifi)
     if (activeFilters.search) {
       const q = activeFilters.search;
-      const titleMatch = item.title[currentLang]?.toLowerCase().includes(q) || item.title.en.toLowerCase().includes(q);
-      const countryMatch = item.countryName[currentLang]?.toLowerCase().includes(q) || item.countryName.en.toLowerCase().includes(q);
-      const organizerMatch = item.organizer.toLowerCase().includes(q);
-      const descMatch = item.description[currentLang]?.toLowerCase().includes(q);
+      const titleText = (getLangText(item.title) + " " + (item.title.en || "")).toLowerCase();
+      const countryText = (getLangText(item.countryName) + " " + (item.countryName.en || "")).toLowerCase();
+      const organizerText = item.organizer.toLowerCase();
+      const descText = (getLangText(item.description) + " " + (item.description.en || "")).toLowerCase();
       const tagsMatch = item.tags.some(t => t.toLowerCase().includes(q));
 
-      if (!titleMatch && !countryMatch && !organizerMatch && !descMatch && !tagsMatch) {
+      if (!titleText.includes(q) && !countryText.includes(q) && !organizerText.includes(q) && !descText.includes(q) && !tagsMatch) {
         return false;
       }
     }
@@ -230,7 +238,7 @@ function getFilteredScholarships() {
     } else if (activeFilters.sortBy === 'deadline_late') {
       return new Date(b.deadline) - new Date(a.deadline);
     } else if (activeFilters.sortBy === 'name_asc') {
-      return a.title[currentLang].localeCompare(b.title[currentLang]);
+      return getLangText(a.title).localeCompare(getLangText(b.title));
     } else if (activeFilters.sortBy === 'popular') {
       return (b.popular ? 1 : 0) - (a.popular ? 1 : 0);
     }
@@ -244,18 +252,19 @@ function renderScholarships() {
   const countBadge = document.getElementById('resultsCountBadge');
   if (!container) return;
 
+  const t = getT();
   const filtered = getFilteredScholarships();
 
   if (countBadge) {
-    countBadge.textContent = `${filtered.length} ${translations[currentLang].foundResults}`;
+    countBadge.textContent = `${filtered.length} ${t.foundResults}`;
   }
 
   if (filtered.length === 0) {
     container.innerHTML = `
       <div class="no-results-box">
         <div class="no-results-icon">🔍</div>
-        <h3>${translations[currentLang].noResults}</h3>
-        <button class="btn btn-outline" onclick="resetAllFilters()">${translations[currentLang].resetFilters}</button>
+        <h3>${t.noResults}</h3>
+        <button class="btn btn-outline" onclick="resetAllFilters()">${t.resetFilters}</button>
       </div>
     `;
     return;
@@ -267,26 +276,30 @@ function renderScholarships() {
   filtered.forEach(grant => {
     const daysLeft = calculateDaysLeft(grant.deadline);
     let deadlineBadgeClass = 'badge-active';
-    let deadlineText = `${daysLeft} ${translations[currentLang].grantDaysLeft}`;
+    let deadlineText = `${daysLeft} ${t.grantDaysLeft}`;
 
     if (daysLeft < 0) {
       deadlineBadgeClass = 'badge-expired';
-      deadlineText = translations[currentLang].grantDeadlinePassed;
+      deadlineText = t.grantDeadlinePassed;
     } else if (daysLeft === 0) {
       deadlineBadgeClass = 'badge-urgent';
-      deadlineText = translations[currentLang].grantToday;
+      deadlineText = t.grantToday;
     } else if (daysLeft <= 14) {
       deadlineBadgeClass = 'badge-urgent';
     }
 
     const isInPlanner = !!planner[grant.id];
+    const grantTitle = getLangText(grant.title);
+    const countryName = getLangText(grant.countryName);
+    const degreeLabel = getLangText(grant.degreeLabels);
+    const description = getLangText(grant.description);
 
     html += `
       <div class="scholarship-card animate-fade-in" data-id="${grant.id}">
         <div class="card-header">
           <div class="card-country">
             <span class="country-flag">${grant.flag}</span>
-            <span class="country-name">${grant.countryName[currentLang]}</span>
+            <span class="country-name">${countryName}</span>
           </div>
           <span class="deadline-badge ${deadlineBadgeClass}">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -294,22 +307,22 @@ function renderScholarships() {
           </span>
         </div>
 
-        <h3 class="card-title">${grant.title[currentLang]}</h3>
+        <h3 class="card-title">${grantTitle}</h3>
         <p class="card-organizer">${grant.organizer}</p>
 
-        <p class="card-desc">${grant.description[currentLang]}</p>
+        <p class="card-desc">${description}</p>
 
         <div class="card-specs">
           <div class="spec-item">
-            <span class="spec-label">${translations[currentLang].modalDegree}:</span>
-            <span class="spec-value">${grant.degreeLabels[currentLang]}</span>
+            <span class="spec-label">${t.modalDegree}:</span>
+            <span class="spec-value">${degreeLabel}</span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">${translations[currentLang].modalFundingCoverage}:</span>
-            <span class="spec-value font-semibold text-emerald">${grant.funding === 'full' ? translations[currentLang].grantFundingFull : translations[currentLang].grantFundingPartial} (${grant.monthlyStipend})</span>
+            <span class="spec-label">${t.modalFundingCoverage}:</span>
+            <span class="spec-value font-semibold text-emerald">${grant.funding === 'full' ? t.grantFundingFull : t.grantFundingPartial} (${grant.monthlyStipend})</span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">${translations[currentLang].modalLanguageReqs}:</span>
+            <span class="spec-label">${t.modalLanguageReqs}:</span>
             <span class="spec-value">${grant.ieltsReq}</span>
           </div>
         </div>
@@ -320,15 +333,15 @@ function renderScholarships() {
 
         <div class="card-footer">
           <button class="btn btn-primary btn-view" onclick="openGrantModal('${grant.id}')">
-            ${translations[currentLang].viewDetails}
+            ${t.viewDetails}
           </button>
           <button class="btn btn-outline btn-plan ${isInPlanner ? 'in-planner' : ''}" data-planner-btn="${grant.id}" onclick="togglePlannerItem('${grant.id}')">
             ${isInPlanner ? `
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span>${translations[currentLang].inPlanner}</span>
+              <span>${t.inPlanner}</span>
             ` : `
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-              <span>${translations[currentLang].addToPlanner}</span>
+              <span>${t.addToPlanner}</span>
             `}
           </button>
         </div>
@@ -348,23 +361,26 @@ function openGrantModal(grantId) {
   const modal = document.getElementById('grantDetailModal');
   if (!modal) return;
 
+  const t = getT();
+
   // Ma'lumotlarni to'ldirish
   document.getElementById('modalFlag').textContent = grant.flag;
-  document.getElementById('modalCountry').textContent = grant.countryName[currentLang];
-  document.getElementById('modalTitle').textContent = grant.title[currentLang];
+  document.getElementById('modalCountry').textContent = getLangText(grant.countryName);
+  document.getElementById('modalTitle').textContent = getLangText(grant.title);
   document.getElementById('modalOrganizer').textContent = grant.organizer;
-  document.getElementById('modalOverviewText').textContent = grant.description[currentLang];
+  document.getElementById('modalOverviewText').textContent = getLangText(grant.description);
 
   const daysLeft = calculateDaysLeft(grant.deadline);
-  document.getElementById('modalDeadlineVal').innerHTML = `<strong>${grant.deadlineDisplay}</strong> (${grant.deadline}) — <span class="text-emerald">${daysLeft} ${translations[currentLang].grantDaysLeft}</span>`;
-  document.getElementById('modalDegreeVal').textContent = grant.degreeLabels[currentLang];
-  document.getElementById('modalFundingVal').textContent = `${grant.funding === 'full' ? translations[currentLang].grantFundingFull : translations[currentLang].grantFundingPartial} (${grant.monthlyStipend})`;
+  document.getElementById('modalDeadlineVal').innerHTML = `<strong>${grant.deadlineDisplay}</strong> (${grant.deadline}) — <span class="text-emerald">${daysLeft} ${t.grantDaysLeft}</span>`;
+  document.getElementById('modalDegreeVal').textContent = getLangText(grant.degreeLabels);
+  document.getElementById('modalFundingVal').textContent = `${grant.funding === 'full' ? t.grantFundingFull : t.grantFundingPartial} (${grant.monthlyStipend})`;
   document.getElementById('modalIeltsVal').textContent = grant.ieltsReq;
   document.getElementById('modalGpaVal').textContent = grant.gpaReq;
 
   // Imtiyozlar (Benefits)
+  const benefitsArr = grant.benefits[currentLang] || grant.benefits.en || grant.benefits.uz || [];
   const benefitsList = document.getElementById('modalBenefitsList');
-  benefitsList.innerHTML = grant.benefits[currentLang].map(b => `
+  benefitsList.innerHTML = benefitsArr.map(b => `
     <li class="benefit-item">
       <span class="icon-check">✓</span>
       <span>${b}</span>
@@ -372,8 +388,9 @@ function openGrantModal(grantId) {
   `).join('');
 
   // Talablar (Requirements)
+  const reqsArr = grant.requirements[currentLang] || grant.requirements.en || grant.requirements.uz || [];
   const reqsList = document.getElementById('modalRequirementsList');
-  reqsList.innerHTML = grant.requirements[currentLang].map(r => `
+  reqsList.innerHTML = reqsArr.map(r => `
     <li class="req-item">
       <span class="bullet">•</span>
       <span>${r}</span>
@@ -381,8 +398,9 @@ function openGrantModal(grantId) {
   `).join('');
 
   // Kerakli Hujjatlar (Documents Checklist)
+  const docsArr = grant.documents[currentLang] || grant.documents.en || grant.documents.uz || [];
   const docsList = document.getElementById('modalDocumentsList');
-  docsList.innerHTML = grant.documents[currentLang].map((d, index) => `
+  docsList.innerHTML = docsArr.map((d, index) => `
     <li class="doc-checklist-item">
       <input type="checkbox" id="doc-check-${grant.id}-${index}">
       <label for="doc-check-${grant.id}-${index}">${d}</label>
@@ -390,11 +408,12 @@ function openGrantModal(grantId) {
   `).join('');
 
   // Eslatmalar va Maslahatlar (Tips)
+  const tipsArr = grant.tips[currentLang] || grant.tips.en || grant.tips.uz || [];
   const tipsList = document.getElementById('modalTipsList');
-  tipsList.innerHTML = grant.tips[currentLang].map(t => `
+  tipsList.innerHTML = tipsArr.map(tip => `
     <li class="tip-item">
       <span class="tip-icon">💡</span>
-      <span>${t}</span>
+      <span>${tip}</span>
     </li>
   `).join('');
 
@@ -402,7 +421,7 @@ function openGrantModal(grantId) {
   const applyBtn = document.getElementById('modalOfficialLinkBtn');
   if (applyBtn) {
     applyBtn.href = grant.officialUrl;
-    applyBtn.textContent = translations[currentLang].applyNowOfficial;
+    applyBtn.textContent = t.applyNowOfficial;
   }
 
   // Rejaga qo'shish tugmasi
@@ -410,14 +429,13 @@ function openGrantModal(grantId) {
   const isInPlanner = !!planner[grant.id];
   const modalPlanBtn = document.getElementById('modalPlannerBtn');
   if (modalPlanBtn) {
-    modalPlanBtn.innerHTML = isInPlanner ? `✓ ${translations[currentLang].inPlanner}` : `+ ${translations[currentLang].addToPlanner}`;
+    modalPlanBtn.innerHTML = isInPlanner ? `✓ ${t.inPlanner}` : `+ ${t.addToPlanner}`;
     modalPlanBtn.onclick = () => {
       togglePlannerItem(grant.id);
-      openGrantModal(grant.id); // holatni yangilash
+      openGrantModal(grant.id);
     };
   }
 
-  // Modalni ko'rsatish
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -431,24 +449,25 @@ function closeGrantModal() {
   }
 }
 
-// Eslatma sozlash (Reminder notification)
+// Eslatma sozlash
 function setDeadlineReminder() {
   if (!currentModalGrant) return;
+  const t = getT();
 
   if (!("Notification" in window)) {
-    showToast("Brauzeringiz bildirishnomalarni qo'llab-quvvatlamaydi. Rejangizga saqlab qo'ydik!", "info");
+    showToast("Notification not supported in this browser. Saved to planner!", "info");
     return;
   }
 
   Notification.requestPermission().then(permission => {
     if (permission === "granted") {
-      new Notification(`GrantWay: ${currentModalGrant.title[currentLang]}`, {
-        body: `Deadline: ${currentModalGrant.deadline}. Hujjatlaringizni tayyorlashni unutmang!`,
-        icon: "assets/logo.png"
+      new Notification(`GrantWay: ${getLangText(currentModalGrant.title)}`, {
+        body: `Deadline: ${currentModalGrant.deadline}.`,
+        icon: "assets/favicon.svg"
       });
-      showToast(translations[currentLang].reminderSuccess, "success");
+      showToast(t.reminderSuccess, "success");
     } else {
-      showToast("Bildirishnomalarga ruxsat berilmadi, lekin rejangizga kiritildi.", "info");
+      showToast(t.reminderSuccess, "info");
     }
   });
 }
@@ -458,15 +477,17 @@ function renderUniversities(query = '') {
   const container = document.getElementById('universitiesGrid');
   if (!container) return;
 
+  const t = getT();
   const filtered = universitiesData.filter(uni => {
     if (!query) return true;
-    return uni.name.toLowerCase().includes(query) ||
-           uni.country[currentLang]?.toLowerCase().includes(query) ||
-           uni.city.toLowerCase().includes(query);
+    const uniName = uni.name.toLowerCase();
+    const uniCountry = getLangText(uni.country).toLowerCase();
+    const uniCity = uni.city.toLowerCase();
+    return uniName.includes(query) || uniCountry.includes(query) || uniCity.includes(query);
   });
 
   if (filtered.length === 0) {
-    container.innerHTML = `<p class="text-center w-full py-8">${translations[currentLang].noResults}</p>`;
+    container.innerHTML = `<p class="text-center w-full py-8">${t.noResults}</p>`;
     return;
   }
 
@@ -480,29 +501,29 @@ function renderUniversities(query = '') {
         </div>
         <div class="uni-card-body">
           <h3 class="uni-name">${uni.name}</h3>
-          <p class="uni-location">📍 ${uni.city}, ${uni.country[currentLang]}</p>
-          <p class="uni-desc">${uni.description[currentLang]}</p>
+          <p class="uni-location">📍 ${uni.city}, ${getLangText(uni.country)}</p>
+          <p class="uni-desc">${getLangText(uni.description)}</p>
 
           <div class="uni-meta-grid">
             <div class="uni-meta-item">
-              <span class="meta-label">${translations[currentLang].uniAcceptanceRate}:</span>
+              <span class="meta-label">${t.uniAcceptanceRate}:</span>
               <span class="meta-val font-semibold">${uni.acceptanceRate}</span>
             </div>
             <div class="uni-meta-item">
-              <span class="meta-label">${translations[currentLang].uniAvgTuition}:</span>
+              <span class="meta-label">${t.uniAvgTuition}:</span>
               <span class="meta-val font-semibold">${uni.avgTuition}</span>
             </div>
           </div>
 
           <div class="uni-scholarships-box">
-            <span class="meta-label">${translations[currentLang].uniScholarshipsAvailable}:</span>
+            <span class="meta-label">${t.uniScholarshipsAvailable}:</span>
             <div class="uni-tags-wrap">
               ${uni.scholarshipsAvailable.map(s => `<span class="uni-grant-pill">${s}</span>`).join('')}
             </div>
           </div>
 
           <a href="${uni.website}" target="_blank" rel="noopener noreferrer" class="btn btn-outline uni-visit-btn">
-            ${translations[currentLang].uniVisitSite} ↗
+            ${t.uniVisitSite} ↗
           </a>
         </div>
       </div>
@@ -524,44 +545,21 @@ const guidesContent = {
       uz: `
         <h4>1. Umumiy gaplardan qoching (No clichés)</h4>
         <p>"Bolaligimdan buyon kompyuterlarga qiziqaman" yoki "Men dunyoni yaxshiroq qilmoqchiman" kabi so'zlar qabul komissiyasini zeriktiradi. Uning o'rniga aniq bir voqea, siz duch kelgan muammo va uni qanday hal qilganingiz haqida yozing.</p>
-        
         <h4>2. "Nega aynan bu universitet va dastur?"</h4>
         <p>Ko'pchilik grant saytidan nusxa olib qo'yadi. Siz esa professorning aniq maqolasi, universitetdagi maxsus laboratoriya yoki o'quv rejasidagi o'ziga xos modulni nomma-nom keltiring.</p>
-        
         <h4>3. STAR formulasidan foydalaning</h4>
         <p><strong>S (Situation):</strong> Qanday vaziyat edi?<br>
         <strong>T (Task):</strong> Sizning oldingizdagi vazifa nima edi?<br>
         <strong>A (Action):</strong> Aynan siz nima qildingiz?<br>
-        <strong>R (Result):</strong> Qanday natijaga erishildi (sonlar va faktlar bilan)?</p>
-
-        <h4>4. Kelajakdagi aniq rejangiz (Career Goals)</h4>
-        <p>O'qishni tugatgach nima qilasiz? 2-3 yillik va 5-10 yillik professional maqsadlaringizni aniq ko'rsating. Qabul qiluvchilar o'z investitsiyasini kimga kiritayotganini ko'rishi kerak.</p>
+        <strong>R (Result):</strong> Qanday natijaga erishildi?</p>
       `,
       en: `
         <h4>1. Avoid Generic Openers</h4>
         <p>Skip lines like "Ever since I was a child..." Focus instead on a catalyst project, an academic challenge you solved, or a pivotal moment that shaped your focus.</p>
-        
         <h4>2. Be Hyper-Specific About the University</h4>
         <p>Name prospective advisors, specific research centers, unique course modules, or facilities that are only available at this particular institution.</p>
-        
         <h4>3. Utilize the STAR Method</h4>
         <p>Structure your impact: Situation, Task, Action, and Measurable Result.</p>
-        
-        <h4>4. Realistic, Concrete Long-Term Vision</h4>
-        <p>Outline realistic 3-year and 7-year career trajectories demonstrating how this scholarship directly unlocks your capability to create impact.</p>
-      `,
-      ru: `
-        <h4>1. Избегайте банальных клише</h4>
-        <p>Фразы вроде «С самого детства я мечтал стать программистом» мгновенно портят впечатление. Начните с конкретного проекта, исследовательской проблемы или практического опыта.</p>
-        
-        <h4>2. Почему именно этот университет?</h4>
-        <p>Назовите конкретных профессоров, лаборатории, дисциплины и совместные программы, которых нет в других вузах.</p>
-        
-        <h4>3. Применяйте метод STAR</h4>
-        <p>Ситуация (Situation), Задача (Task), Ваше действие (Action) и измеримый Результат (Result).</p>
-        
-        <h4>4. Четкий план после выпуска</h4>
-        <p>Сформулируйте 3-5-летние цели: где вы будете работать и какую практическую пользу принесете обществу.</p>
       `
     }
   },
@@ -574,33 +572,15 @@ const guidesContent = {
     body: {
       uz: `
         <h4>1. To'g'ri tavsiya beruvchini tanlang</h4>
-        <p>Faqat unvoni baland dekan emas, balki sizning akademik yoki ilmiy mehnatingizni shaxsan biladigan, darsida faol qatnashgan o'qituvchingizdan tavsiyanoma oling.</p>
-        
+        <p>Sizning akademik yoki ilmiy mehnatingizni shaxsan biladigan, faol qatnashgan o'qituvchingizdan tavsiyanoma oling.</p>
         <h4>2. Professorga "Brifing Paketi" tayyorlab bering</h4>
-        <p>Professorga shunchaki "menga xat yozib bering" demang. Unga: o'zingizning CVingiz, topshirayotgan granti talablari va uning darsida qaysi loyihani bajarganingizni eslatuvchi 1 varaqli eslatma yuboring.</p>
-
-        <h4>3. Rasmiy blanka va imzo</h4>
-        <p>Tavsiyanoma albatta universitet yoki tashkilotning rasmiy blankasida, muhr, sana va tavsiya beruvchining ishchi elektron pochtasi bilan bo'lishi shart (@gmail.com emas, balki @university.edu).</p>
+        <p>CVingiz, topshirayotgan grant talablari va uning darsida qaysi loyihani bajarganingizni eslatuvchi 1 varaqli eslatma yuboring.</p>
       `,
       en: `
         <h4>1. Choose Recommenders Who Truly Know You</h4>
-        <p>A specific, insightful letter from an assistant professor who supervised your lab work outweighs a generic form letter from a busy faculty dean.</p>
-        
+        <p>A specific, insightful letter from an instructor who supervised your lab work outweighs a generic form letter from a busy faculty dean.</p>
         <h4>2. Provide a Comprehensive Brag Sheet</h4>
-        <p>Hand your recommender your updated CV, course grade, copies of papers you wrote for them, and key prompts of the scholarship.</p>
-        
-        <h4>3. Official Institutional Letterhead & Email</h4>
-        <p>Ensure the recommendation is signed on university letterhead with an official institutional email address.</p>
-      `,
-      ru: `
-        <h4>1. Выбирайте того, кто знает вас лично</h4>
-        <p>Теплое, подробное письмо от преподавателя вашего семинара ценится комиссией выше, чем пара сухих стандартных абзацев от ректора.</p>
-        
-        <h4>2. Подготовьте для рекомендателя резюме-бриф</h4>
-        <p>Напомните профессору, какие курсовые и проекты вы у него защищали, приложите свое CV и дедлайны программы.</p>
-        
-        <h4>3. Официальный бланк и корпоративная почта</h4>
-        <p>Письмо должно быть на официальном бланке с печатью, подписью и корпоративным адресом электронной почты (@edu).</p>
+        <p>Hand your recommender your updated CV, course grade, and key prompts of the scholarship.</p>
       `
     }
   },
@@ -613,33 +593,15 @@ const guidesContent = {
     body: {
       uz: `
         <h4>1. Europass va AQSH akademik CV farqi</h4>
-        <p>Yevropa davlatlari (Germaniya, Vengriya, Shvetsiya) ko'pincha Europass formatini xush ko'radi. AQSH uchun esa klassik 1-2 sahifalik toza, rasm va tug'ilgan sana kiritilmagan minimalist dizayn kerak.</p>
-        
+        <p>Yevropa davlatlari ko'pincha Europass formatini xush ko'radi. AQSH uchun esa klassik 1-2 sahifalik toza minimalist dizayn kerak.</p>
         <h4>2. Harakat fe'llari (Action Verbs)</h4>
-        <p>"Loyihada qatnashdim" emas, balki "5 kishilik guruhni boshqardim, 30% xatolikni kamaytirdim va yangi modulni joriy qildim" (Led, developed, optimized, published).</p>
-
-        <h4>3. To'g'ri xronologik tartib</h4>
-        <p>Har doim Reverse Chronological (eng so'nggi yutuqlardan boshlab orqaga qarab) tartibda yozing.</p>
+        <p>"Led, developed, optimized, published, analyzed" kabi aniq fe'llardan foydalaning.</p>
       `,
       en: `
         <h4>1. Regional Expectations: Europe vs. USA</h4>
         <p>European portals often suggest Europass styling. US institutions prefer clean 1-page resumes free of photos, age, marital status, or nationality.</p>
-        
         <h4>2. Use Powerful Action Verbs</h4>
         <p>Quantify your contributions: "Spearheaded research analyzing 5,000 datapoints", "Optimized algorithmic runtime by 42%".</p>
-        
-        <h4>3. Reverse-Chronological Order</h4>
-        <p>Always list your most recent experiences and degrees first.</p>
-      `,
-      ru: `
-        <h4>1. Разница между США и Европой</h4>
-        <p>Для программ в Европе часто подходит формат Europass. Для США резюме должно быть лаконичным, без фото, даты рождения и семейного положения.</p>
-        
-        <h4>2. Глаголы действия и цифры</h4>
-        <p>Не просто перечисляйте обязанности, а пишите о результатах: «Разработал модель», «Повысил точность на 25%», «Организовал конференцию на 200 участников».</p>
-        
-        <h4>3. Обратный хронологический порядок</h4>
-        <p>Указывайте ваш самый свежий академический и рабочий опыт в начале списка.</p>
       `
     }
   },
@@ -654,37 +616,15 @@ const guidesContent = {
         <h4>1. Eng ko'p so'raladigan savollar</h4>
         <p>• Nega aynan ushbu davlatni tanladingiz?<br>
         • Nega aynan sizga bu grantni berishimiz kerak?<br>
-        • Ta'limdan so'ng vataningizga qaytish rejangiz qanday?<br>
-        • Murakkab stressli vaziyatda qanday yo'l tutgansiz?</p>
-        
+        • Ta'limdan so'ng vataningizga qaytish rejangiz qanday?</p>
         <h4>2. Shaxsiy qadriyatlar va madaniyat elchisi</h4>
-        <p>Grant beruvchi hukumatlar sizni o'z davlatingiz va xalqaro hamjamiyat o'rtasidagi ko'prik deb hisoblaydi. Ochiqko'ngil, do'stona va bag'rikeng ekaningizni ko'rsating.</p>
-        
-        <h4>3. O'zingiz ham savol bering</h4>
-        <p>Suhbat oxirida "Savollaringiz bormi?" deb so'rashganda hech qachon "Yo'q" demang. Universitetdagi imkoniyatlar yoki laboratoriya loyihalari haqida oldindan tayyorlangan aqlli savol bering.</p>
+        <p>Ochiqko'ngil, do'stona va xalqaro hamjamiyat bilan ishlashga tayyor ekaningizni namoyish eting.</p>
       `,
       en: `
         <h4>1. Anticipate Core Evaluative Prompts</h4>
         <p>Why this specific destination? Why should we select you over hundreds of other applicants? What is your post-graduate re-entry plan?</p>
-        
         <h4>2. Embody Cultural Ambassadorship</h4>
         <p>Committees fund candidates who will actively foster international dialogue and cross-cultural understanding.</p>
-        
-        <h4>3. Always Ask Thoughtful Questions</h4>
-        <p>When asked if you have questions, engage the interviewers on faculty initiatives, research symposiums, or university-industry partnerships.</p>
-      `,
-      ru: `
-        <h4>1. Ключевые вопросы на интервью</h4>
-        <p>• Почему именно эта страна и специальность?<br>
-        • Почему комиссия должна выбрать именно вас?<br>
-        • Как именно вы примените знания после возвращения на родину?<br>
-        • Расскажите о преодолении сложной командной проблемы.</p>
-        
-        <h4>2. Вы — культурный посол своей страны</h4>
-        <p>Организаторам грантов важно увидеть вашу зрелость, открытость к межкультурному общению и готовность строить партнерские связи.</p>
-        
-        <h4>3. Обязательно задавайте встречные вопросы</h4>
-        <p>В конце беседы задайте 1-2 продуманных вопроса о научных лабораториях, менторских программах или студенческих инициативах.</p>
       `
     }
   }
@@ -697,8 +637,11 @@ function openGuideModal(guideKey) {
   const modal = document.getElementById('guideDetailModal');
   if (!modal) return;
 
-  document.getElementById('guideModalTitle').textContent = guide.title[currentLang];
-  document.getElementById('guideModalBody').innerHTML = guide.body[currentLang];
+  const title = getLangText(guide.title);
+  const body = guide.body[currentLang] || guide.body.en || guide.body.uz || '';
+
+  document.getElementById('guideModalTitle').textContent = title;
+  document.getElementById('guideModalBody').innerHTML = body;
 
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';

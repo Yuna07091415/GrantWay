@@ -10,6 +10,7 @@ function runEligibilityMatcher() {
 
   const resultsContainer = document.getElementById('matcherResultsContainer');
   const resultsCard = document.getElementById('matcherResultsCard');
+  const t = translations[currentLang] || translations.en || translations.uz;
 
   if (!resultsContainer || !resultsCard) return;
 
@@ -71,7 +72,7 @@ function runEligibilityMatcher() {
     return { grant, percentage };
   });
 
-  // Eng yuqori foizli grantlarni tartiblash (kamida 70% moslik)
+  // Eng yuqori foizli grantlarni tartiblash (kamida 65% moslik)
   scoredGrants.sort((a, b) => b.percentage - a.percentage);
   const topMatches = scoredGrants.filter(item => item.percentage >= 65).slice(0, 4);
 
@@ -80,7 +81,7 @@ function runEligibilityMatcher() {
   if (topMatches.length === 0) {
     html = `
       <div class="empty-matches">
-        <p>${translations[currentLang].noResults}</p>
+        <p>${t.noResults}</p>
       </div>
     `;
   } else {
@@ -89,22 +90,26 @@ function runEligibilityMatcher() {
       if (percentage < 80) matchColor = '#3b82f6'; // ko'k
       if (percentage < 70) matchColor = '#f59e0b'; // to'q sariq
 
+      const grantTitle = getLangText(grant.title);
+      const countryName = getLangText(grant.countryName);
+      const degreeLabel = getLangText(grant.degreeLabels);
+
       html += `
         <div class="matcher-result-item animate-fade-in">
           <div class="match-badge" style="background-color: ${matchColor}15; color: ${matchColor}; border: 1px solid ${matchColor}40;">
             <span class="match-score font-bold">${percentage}%</span>
-            <small>${translations[currentLang].quizMatchPercent}</small>
+            <small>${t.quizMatchPercent}</small>
           </div>
           <div class="match-info">
-            <h4 class="match-title">${grant.flag} ${grant.title[currentLang]}</h4>
-            <p class="match-desc">${grant.countryName[currentLang]} • ${grant.degreeLabels[currentLang]} • ${grant.funding === 'full' ? translations[currentLang].grantFundingFull : translations[currentLang].grantFundingPartial}</p>
+            <h4 class="match-title">${grant.flag} ${grantTitle}</h4>
+            <p class="match-desc">${countryName} • ${degreeLabel} • ${grant.funding === 'full' ? t.grantFundingFull : t.grantFundingPartial}</p>
           </div>
           <div class="match-actions">
             <button class="btn btn-sm btn-outline" onclick="openGrantModal('${grant.id}')">
-              ${translations[currentLang].viewDetails}
+              ${t.viewDetails}
             </button>
             <button class="btn btn-sm btn-primary" onclick="togglePlannerItem('${grant.id}')">
-              ${translations[currentLang].addToPlanner}
+              ${t.addToPlanner}
             </button>
           </div>
         </div>

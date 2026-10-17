@@ -344,8 +344,52 @@ h1, h2, h3, h4 {
 .telegram-lang-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.75rem;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+
+.telegram-lang-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.telegram-lang-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.telegram-lang-list::-webkit-scrollbar-thumb {
+  background: #2d3b55;
+  border-radius: 4px;
+}
+
+.telegram-lang-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* RTL Mode (Arab tili va o'ngdan chapga yoziladigan tillar uchun) */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .search-icon {
+  margin-right: 0;
+  margin-left: 0.75rem;
+}
+
+[dir="rtl"] .brand-logo, [dir="rtl"] .card-country, [dir="rtl"] .planner-card-info, [dir="rtl"] .lang-info {
+  flex-direction: row;
+}
+
+[dir="rtl"] .lang-native-name, [dir="rtl"] .lang-sub-name {
+  text-align: right;
+}
+
+[dir="rtl"] .modal-footer-actions, [dir="rtl"] .planner-tools-wrap {
+  flex-direction: row-reverse;
 }
 
 .lang-select-btn {

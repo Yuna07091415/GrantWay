@@ -1373,15 +1373,114 @@ const universitiesData = [
 
 // Ommabop davlatlar filtri uchun ro'yxat
 const countriesList = [
-  { code: "ALL", name: { uz: "Barcha mamlakatlar", en: "All Countries", ru: "Все страны" } },
-  { code: "GB", name: { uz: "Buyuk Britaniya 🇬🇧", en: "United Kingdom 🇬🇧", ru: "Великобритания 🇬🇧" } },
-  { code: "US", name: { uz: "AQSH 🇺🇸", en: "United States 🇺🇸", ru: "США 🇺🇸" } },
-  { code: "DE", name: { uz: "Germaniya 🇩🇪", en: "Germany 🇩🇪", ru: "Германия 🇩🇪" } },
-  { code: "TR", name: { uz: "Turkiya 🇹🇷", en: "Turkey 🇹🇷", ru: "Турция 🇹🇷" } },
-  { code: "HU", name: { uz: "Vengriya 🇭🇺", en: "Hungary 🇭🇺", ru: "Венгрия 🇭🇺" } },
-  { code: "KR", name: { uz: "Janubiy Koreya 🇰🇷", en: "South Korea 🇰🇷", ru: "Южная Корея 🇰🇷" } },
-  { code: "JP", name: { uz: "Yaponiya 🇯🇵", en: "Japan 🇯🇵", ru: "Япония 🇯🇵" } },
-  { code: "EU", name: { uz: "Yevropa Ittifoqi 🇪🇺", en: "European Union 🇪🇺", ru: "Европейский Союз 🇪🇺" } },
-  { code: "SE", name: { uz: "Shvetsiya 🇸🇪", en: "Sweden 🇸🇪", ru: "Швеция 🇸🇪" } },
-  { code: "UZ", name: { uz: "O'zbekiston / Xalqaro 🇺🇿", en: "Uzbekistan / Global 🇺🇿", ru: "Узбекистан / Мир 🇺🇿" } }
+  { 
+    code: "ALL", 
+    name: { 
+      uz: "Barcha mamlakatlar", en: "All Countries", ru: "Все страны",
+      ko: "모든 국가", zh: "所有国家", ja: "すべての国", tr: "Tüm Ülkeler",
+      ar: "جميع الدول", de: "Alle Länder", fr: "Tous les pays", es: "Todos los países",
+      it: "Tutti i paesi", pt: "Todos os países", "pt-br": "Todos os países",
+      kk: "Барлық елдер", th: "ทุกประเทศ", vi: "Tất cả quốc gia", fil: "Lahat ng Bansa"
+    } 
+  },
+  { 
+    code: "GB", 
+    name: { 
+      uz: "Buyuk Britaniya 🇬🇧", en: "United Kingdom 🇬🇧", ru: "Великобритания 🇬🇧",
+      ko: "영국 🇬🇧", zh: "英国 🇬🇧", ja: "イギリス 🇬🇧", tr: "Birleşik Krallık 🇬🇧",
+      ar: "المملكة المتحدة 🇬🇧", de: "Großbritannien 🇬🇧", fr: "Royaume-Uni 🇬🇧", es: "Reino Unido 🇬🇧",
+      it: "Regno Unito 🇬🇧", pt: "Reino Unido 🇬🇧", "pt-br": "Reino Unido 🇬🇧",
+      kk: "Ұлыбритания 🇬🇧", th: "สหราชอาณาจักร 🇬🇧", vi: "Vương quốc Anh 🇬🇧", fil: "United Kingdom 🇬🇧"
+    } 
+  },
+  { 
+    code: "US", 
+    name: { 
+      uz: "AQSH 🇺🇸", en: "United States 🇺🇸", ru: "США 🇺🇸",
+      ko: "미국 🇺🇸", zh: "美国 🇺🇸", ja: "アメリカ 🇺🇸", tr: "Amerika Birleşik Devletleri 🇺🇸",
+      ar: "الولايات المتحدة 🇺🇸", de: "USA 🇺🇸", fr: "États-Unis 🇺🇸", es: "Estados Unidos 🇺🇸",
+      it: "Stati Uniti 🇺🇸", pt: "Estados Unidos 🇺🇸", "pt-br": "Estados Unidos 🇺🇸",
+      kk: "АҚШ 🇺🇸", th: "สหรัฐอเมริกา 🇺🇸", vi: "Hoa Kỳ 🇺🇸", fil: "Estados Unidos 🇺🇸"
+    } 
+  },
+  { 
+    code: "DE", 
+    name: { 
+      uz: "Germaniya 🇩🇪", en: "Germany 🇩🇪", ru: "Германия 🇩🇪",
+      ko: "독일 🇩🇪", zh: "德国 🇩🇪", ja: "ドイツ 🇩🇪", tr: "Almanya 🇩🇪",
+      ar: "ألمانيا 🇩🇪", de: "Deutschland 🇩🇪", fr: "Allemagne 🇩🇪", es: "Alemania 🇩🇪",
+      it: "Germania 🇩🇪", pt: "Alemanha 🇩🇪", "pt-br": "Alemanha 🇩🇪",
+      kk: "Германия 🇩🇪", th: "เยอรมนี 🇩🇪", vi: "Đức 🇩🇪", fil: "Alemanya 🇩🇪"
+    } 
+  },
+  { 
+    code: "TR", 
+    name: { 
+      uz: "Turkiya 🇹🇷", en: "Turkey 🇹🇷", ru: "Турция 🇹🇷",
+      ko: "튀르키예 🇹🇷", zh: "土耳其 🇹🇷", ja: "トルコ 🇹🇷", tr: "Türkiye 🇹🇷",
+      ar: "تركيا 🇹🇷", de: "Türkei 🇹🇷", fr: "Turquie 🇹🇷", es: "Turquía 🇹🇷",
+      it: "Turchia 🇹🇷", pt: "Turquia 🇹🇷", "pt-br": "Turquia 🇹🇷",
+      kk: "Түркия 🇹🇷", th: "ตุรกี 🇹🇷", vi: "Thổ Nhĩ Kỳ 🇹🇷", fil: "Turkiya 🇹🇷"
+    } 
+  },
+  { 
+    code: "HU", 
+    name: { 
+      uz: "Vengriya 🇭🇺", en: "Hungary 🇭🇺", ru: "Венгрия 🇭🇺",
+      ko: "헝가리 🇭🇺", zh: "匈牙利 🇭🇺", ja: "ハンガリー 🇭🇺", tr: "Macaristan 🇭🇺",
+      ar: "المجر 🇭🇺", de: "Ungarn 🇭🇺", fr: "Hongrie 🇭🇺", es: "Hungría 🇭🇺",
+      it: "Ungheria 🇭🇺", pt: "Hungria 🇭🇺", "pt-br": "Hungria 🇭🇺",
+      kk: "Венгрия 🇭🇺", th: "ฮังการี 🇭🇺", vi: "Hungary 🇭🇺", fil: "Hungary 🇭🇺"
+    } 
+  },
+  { 
+    code: "KR", 
+    name: { 
+      uz: "Janubiy Koreya 🇰🇷", en: "South Korea 🇰🇷", ru: "Южная Корея 🇰🇷",
+      ko: "대한민국 🇰🇷", zh: "韩国 🇰🇷", ja: "韓国 🇰🇷", tr: "Güney Kore 🇰🇷",
+      ar: "كوريا الجنوبية 🇰🇷", de: "Südkorea 🇰🇷", fr: "Corée du Sud 🇰🇷", es: "Corea del Sur 🇰🇷",
+      it: "Corea del Sud 🇰🇷", pt: "Coreia do Sul 🇰🇷", "pt-br": "Coreia do Sul 🇰🇷",
+      kk: "Оңтүстік Корея 🇰🇷", th: "เกาหลีใต้ 🇰🇷", vi: "Hàn Quốc 🇰🇷", fil: "Timog Korea 🇰🇷"
+    } 
+  },
+  { 
+    code: "JP", 
+    name: { 
+      uz: "Yaponiya 🇯🇵", en: "Japan 🇯🇵", ru: "Япония 🇯🇵",
+      ko: "일본 🇯🇵", zh: "日本 🇯🇵", ja: "日本 🇯🇵", tr: "Japonya 🇯🇵",
+      ar: "اليابان 🇯🇵", de: "Japan 🇯🇵", fr: "Japon 🇯🇵", es: "Japón 🇯🇵",
+      it: "Giappone 🇯🇵", pt: "Japão 🇯🇵", "pt-br": "Japão 🇯🇵",
+      kk: "Жапония 🇯🇵", th: "ญี่ปุ่น 🇯🇵", vi: "Nhật Bản 🇯🇵", fil: "Hapon 🇯🇵"
+    } 
+  },
+  { 
+    code: "EU", 
+    name: { 
+      uz: "Yevropa Ittifoqi 🇪🇺", en: "European Union 🇪🇺", ru: "Европейский Союз 🇪🇺",
+      ko: "유럽연합 🇪🇺", zh: "欧盟 🇪🇺", ja: "欧州連合 🇪🇺", tr: "Avrupa Birliği 🇪🇺",
+      ar: "الاتحاد الأوروبي 🇪🇺", de: "Europäische Union 🇪🇺", fr: "Union Européenne 🇪🇺", es: "Unión Europea 🇪🇺",
+      it: "Unione Europea 🇪🇺", pt: "União Europeia 🇪🇺", "pt-br": "União Europeia 🇪🇺",
+      kk: "Еуропалық Одақ 🇪🇺", th: "สหภาพยุโรป 🇪🇺", vi: "Liên minh Châu Âu 🇪🇺", fil: "Unyong Europeo 🇪🇺"
+    } 
+  },
+  { 
+    code: "SE", 
+    name: { 
+      uz: "Shvetsiya 🇸🇪", en: "Sweden 🇸🇪", ru: "Швеция 🇸🇪",
+      ko: "스웨덴 🇸🇪", zh: "瑞典 🇸🇪", ja: "スウェーデン 🇸🇪", tr: "İsveç 🇸🇪",
+      ar: "السويد 🇸🇪", de: "Schweden 🇸🇪", fr: "Suède 🇸🇪", es: "Suecia 🇸🇪",
+      it: "Svezia 🇸🇪", pt: "Suécia 🇸🇪", "pt-br": "Suécia 🇸🇪",
+      kk: "Швеция 🇸🇪", th: "สวีเดน 🇸🇪", vi: "Thụy Điển 🇸🇪", fil: "Sweden 🇸🇪"
+    } 
+  },
+  { 
+    code: "UZ", 
+    name: { 
+      uz: "O'zbekiston / Xalqaro 🇺🇿", en: "Uzbekistan / Global 🇺🇿", ru: "Узбекистан / Мир 🇺🇿",
+      ko: "우즈베키스탄 / 글로벌 🇺🇿", zh: "乌兹别克斯坦 / 全球 🇺🇿", ja: "ウズベキスタン / グローバル 🇺🇿", tr: "Özbekistan / Küresel 🇺🇿",
+      ar: "أوزبكستان / دولي 🇺🇿", de: "Usbekistan / International 🇺🇿", fr: "Ouzbékistan / International 🇺🇿", es: "Uzbekistán / Global 🇺🇿",
+      it: "Uzbekistan / Internazionale 🇺🇿", pt: "Uzbequistão / Global 🇺🇿", "pt-br": "Uzbequistão / Global 🇺🇿",
+      kk: "Өзбекстан / Әлемдік 🇺🇿", th: "อุซเบกิสถาน / นานาชาติ 🇺🇿", vi: "Uzbekistan / Quốc tế 🇺🇿", fil: "Uzbekistan / Global 🇺🇿"
+    } 
+  }
 ];

@@ -28,42 +28,13 @@
       <h2 class="telegram-modal-title" data-i18n="welcomeTitle">GrantWay portaliga xush kelibsiz!</h2>
       <p class="telegram-modal-subtitle" data-i18n="welcomeSubtitle">Davom etish uchun o'zingizga qulay tilni tanlang (Telegramdagidek)</p>
 
-      <div class="telegram-lang-list">
-        <!-- O'zbek tili -->
-        <button type="button" class="lang-select-btn" data-lang="uz" onclick="setLanguage('uz')">
-          <div class="lang-info">
-            <span class="lang-flag">🇺🇿</span>
-            <div>
-              <div class="lang-native-name">O'zbekcha</div>
-              <div class="lang-sub-name">O'zbek tili (Lotin)</div>
-            </div>
-          </div>
-          <div class="lang-check-radio"></div>
-        </button>
+      <!-- Til qidirish maydoni -->
+      <div style="margin-bottom: 1rem;">
+        <input type="text" id="langSearchInput" class="custom-select" style="width: 100%; border-radius: var(--radius-md); padding: 0.65rem 1rem;" data-i18n-placeholder="searchLangPlaceholder" placeholder="Tilni qidirish / Search language...">
+      </div>
 
-        <!-- English -->
-        <button type="button" class="lang-select-btn" data-lang="en" onclick="setLanguage('en')">
-          <div class="lang-info">
-            <span class="lang-flag">🇬🇧</span>
-            <div>
-              <div class="lang-native-name">English</div>
-              <div class="lang-sub-name">International English</div>
-            </div>
-          </div>
-          <div class="lang-check-radio"></div>
-        </button>
-
-        <!-- Русский -->
-        <button type="button" class="lang-select-btn" data-lang="ru" onclick="setLanguage('ru')">
-          <div class="lang-info">
-            <span class="lang-flag">🇷🇺</span>
-            <div>
-              <div class="lang-native-name">Русский</div>
-              <div class="lang-sub-name">Русский язык</div>
-            </div>
-          </div>
-          <div class="lang-check-radio"></div>
-        </button>
+      <div class="telegram-lang-list" id="telegramLangListContainer">
+        <!-- JS orqali barcha 18 ta til dinamik render qilinadi -->
       </div>
 
       <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 1.25rem;" data-i18n="chooseLangPrompt">

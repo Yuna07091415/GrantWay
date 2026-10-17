@@ -1,30 +1,83 @@
 // GrantWay - Ko'p tillilik moduli (Language Manager)
-// Telegram uslubidagi til tanlash va dinamik yangilanish
+// Telegram uslubidagi til tanlash, qidiruv va RTL (Arab tili) qo'llab-quvvatlashi
 
 let currentLang = 'uz';
 
 // Sayt ishga tushganda tilni aniqlash
 function initLanguage() {
   const savedLang = localStorage.getItem('grantway_lang');
+  const validCodes = languagesConfig.map(l => l.code);
   
-  if (savedLang && ['uz', 'en', 'ru'].includes(savedLang)) {
+  if (savedLang && validCodes.includes(savedLang)) {
     currentLang = savedLang;
   } else {
-    // Agar foydalanuvchi birinchi marta kirgan bo'lsa, Telegramdagi kabi til tanlash oynasini ko'rsatamiz
     currentLang = 'uz'; // standart
     showTelegramLangModal();
   }
   
-  updateLanguageUI();
+  renderTelegramLangList();
+  applyCurrentLanguage();
 }
 
 // Telegram uslubidagi modalni ko'rsatish
 function showTelegramLangModal() {
   const modal = document.getElementById('telegramLangModal');
   if (modal) {
+    renderTelegramLangList();
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Qidiruv inputiga fokus berish
+    setTimeout(() => {
+      const searchInput = document.getElementById('langSearchInput');
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+    }, 200);
   }
+}
+
+// Telegram modalida barcha 18 ta tilni render qilish
+function renderTelegramLangList(query = '') {
+  const container = document.getElementById('telegramLangListContainer');
+  if (!container) return;
+
+  const q = query.trim().toLowerCase();
+  const filtered = languagesConfig.filter(l => {
+    if (!q) return true;
+    return l.name.toLowerCase().includes(q) ||
+           l.sub.toLowerCase().includes(q) ||
+           l.code.toLowerCase().includes(q);
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 1.5rem; color: var(--text-dim);">
+        Til topilmadi / No language found
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(lang => {
+    const isActive = lang.code === currentLang;
+    html += `
+      <button type="button" class="lang-select-btn ${isActive ? 'active' : ''}" data-lang="${lang.code}" onclick="setLanguage('${lang.code}')">
+        <div class="lang-info">
+          <span class="lang-flag">${lang.flag}</span>
+          <div>
+            <div class="lang-native-name">${lang.name}</div>
+            <div class="lang-sub-name">${lang.sub}</div>
+          </div>
+        </div>
+        <div class="lang-check-radio"></div>
+      </button>
+    `;
+  });
+
+  container.innerHTML = html;
 }
 
 // Telegram uslubidagi modalni yopish
@@ -38,77 +91,81 @@ function closeTelegramLangModal() {
 
 // Tilni tanlash va saqlash
 function setLanguage(lang) {
-  if (!['uz', 'en', 'ru'].includes(lang)) return;
+  const validCodes = languagesConfig.map(l => l.code);
+  if (!validCodes.includes(lang)) return;
+
   currentLang = lang;
   localStorage.setItem('grantway_lang', lang);
   
-  // UI ni yangilash
-  updateLanguageUI();
-  
-  // Modalni yopish
+  applyCurrentLanguage();
   closeTelegramLangModal();
+
+  // Foydalanuvchiga xabar
+  const selectedObj = languagesConfig.find(l => l.code === lang);
+  showToast(`Til o'zgartirildi: ${selectedObj?.name} ${selectedObj?.flag}`);
+}
+
+// Tilni qo'llash va DOM elementlarini yangilash
+function applyCurrentLanguage() {
+  const langConfig = languagesConfig.find(l => l.code === currentLang) || languagesConfig[0];
   
-  // Grantlar, Universitetlar va Rejani qayta render qilish
+  // RTL / LTR yo'nalishini belgilash (Arab tili uchun RTL)
+  if (langConfig.dir === 'rtl') {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.classList.add('rtl-mode');
+  } else {
+    document.documentElement.setAttribute('dir', 'ltr');
+    document.documentElement.classList.remove('rtl-mode');
+  }
+
+  document.documentElement.setAttribute('lang', currentLang);
+
+  // Navbardagi joriy til tugmasini yangilash
+  const currentLangLabel = document.getElementById('currentLangLabel');
+  if (currentLangLabel) {
+    currentLangLabel.innerHTML = `<span class="flag">${langConfig.flag}</span> <span>${langConfig.name}</span>`;
+  }
+
+  // Sahifadagi barcha matnlarni tarjima qilish
+  updateLanguageUI();
+
+  // Komponentlarni qayta chizish
   if (typeof renderScholarships === 'function') renderScholarships();
   if (typeof renderUniversities === 'function') renderUniversities();
   if (typeof renderPlanner === 'function') renderPlanner();
   if (typeof updateFilterCountryOptions === 'function') updateFilterCountryOptions();
-  
-  // Animatsiyali bildirishnoma
-  showToast(
-    lang === 'uz' ? "Til O'zbekchaga o'zgartirildi 🇺🇿" :
-    lang === 'ru' ? "Язык переключен на русский 🇷🇺" :
-    "Language changed to English 🇬🇧"
-  );
 }
 
-// Sahifadagi barcha matnlarni joriy tilga o'girish
+// data-i18n elementlarini tarjima qilish
 function updateLanguageUI() {
-  const langPack = translations[currentLang] || translations.uz;
-  
-  // data-i18n bo'lgan barcha elementlarni yangilash
+  const langPack = translations[currentLang] || translations.en || translations.uz;
+  const fallbackPack = translations.en || translations.uz;
+
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (langPack[key]) {
-      el.textContent = langPack[key];
+    const text = langPack[key] || fallbackPack[key];
+    if (text) {
+      el.textContent = text;
     }
   });
 
-  // data-i18n-placeholder bo'lgan elementlar
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
-    if (langPack[key]) {
-      el.placeholder = langPack[key];
-    }
-  });
-
-  // data-i18n-html bo'lgan elementlar (agar kerak bo'lsa)
-  document.querySelectorAll('[data-i18n-html]').forEach(el => {
-    const key = el.getAttribute('data-i18n-html');
-    if (langPack[key]) {
-      el.innerHTML = langPack[key];
-    }
-  });
-
-  // Til tanlash tugmasining ko'rinishini yangilash
-  const currentLangLabel = document.getElementById('currentLangLabel');
-  if (currentLangLabel) {
-    if (currentLang === 'uz') currentLangLabel.innerHTML = `<span class="flag">🇺🇿</span> O'zbekcha`;
-    else if (currentLang === 'en') currentLangLabel.innerHTML = `<span class="flag">🇬🇧</span> English`;
-    else if (currentLang === 'ru') currentLangLabel.innerHTML = `<span class="flag">🇷🇺</span> Русский`;
-  }
-
-  // Active tugmalarni belgilash
-  document.querySelectorAll('.lang-select-btn').forEach(btn => {
-    if (btn.getAttribute('data-lang') === currentLang) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
+    const placeholder = langPack[key] || fallbackPack[key];
+    if (placeholder) {
+      el.placeholder = placeholder;
     }
   });
 }
 
-// Tizimdagi qulay xabarlar (Toast notifications)
+// Tildan matn olish yordamchisi (har qanday ma'lumotlar obyekti uchun xavfsiz fallback)
+function getLangText(obj) {
+  if (!obj) return '';
+  if (typeof obj === 'string') return obj;
+  return obj[currentLang] || obj.en || obj.uz || obj.ru || Object.values(obj)[0] || '';
+}
+
+// Tizimdagi xabarnomalar (Toast)
 function showToast(message, type = 'info') {
   let toastContainer = document.getElementById('toastContainer');
   if (!toastContainer) {
