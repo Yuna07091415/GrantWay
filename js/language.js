@@ -132,6 +132,7 @@ function applyCurrentLanguage() {
   // Komponentlarni qayta chizish
   if (typeof renderScholarships === 'function') renderScholarships();
   if (typeof renderUniversities === 'function') renderUniversities();
+  if (typeof renderCertificates === 'function') renderCertificates();
   if (typeof renderPlanner === 'function') renderPlanner();
   if (typeof updateFilterCountryOptions === 'function') updateFilterCountryOptions();
 }

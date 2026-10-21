@@ -64,12 +64,14 @@
       <nav class="nav-menu" id="mainNavLinks">
         <a href="#grants" class="nav-link" data-i18n="navGrants">Grantlar</a>
         <a href="#universities" class="nav-link" data-i18n="navUniversities">Universitetlar</a>
+        <a href="#certificates" class="nav-link" data-i18n="navCertificates">Sertifikatlar</a>
         <a href="#planner" class="nav-link">
           <span data-i18n="navPlanner">Ariza Rejasi</span>
           <span class="nav-badge planner-count-badge" style="display: none;">0</span>
         </a>
         <a href="#matcher" class="nav-link" data-i18n="navMatcher">Moslik Kalkulyatori</a>
         <a href="#guides" class="nav-link" data-i18n="navGuides">Qo'llanmalar</a>
+        <a href="#qrcode" class="nav-link" data-i18n="navQrCode">📱 Mobil QR</a>
       </nav>
 
       <!-- Nav Actions (Til tanlash & Mobile toggle) -->
@@ -451,6 +453,94 @@
         </div>
       </div>
     </section>
+
+    <!-- ==========================================================================
+         Certificates & Test Preparation Section
+         ========================================================================== -->
+    <section class="certificates-section" id="certificates">
+      <div class="container">
+        <div class="section-header-block">
+          <div class="hero-badge-wrap" style="margin-bottom: 0.75rem;">
+            <span>🎓 Imtihonlar & Til Sertifikatlari</span>
+          </div>
+          <h2 class="section-title" data-i18n="certTitle">Xalqaro & Milliy Sertifikatlar Markazi</h2>
+          <p class="section-subtitle" data-i18n="certSubtitle">
+            Ona tili (BMBA), Koreys tili (TOPIK), Ingliz tili (IELTS, TOEFL), Nemis va Yapon tili sertifikatlariga 100% samarali tayyorgarlik manbalari.
+          </p>
+        </div>
+
+        <!-- Filter tabs for certificates -->
+        <div class="cert-filter-bar">
+          <button class="cert-tab-btn active" onclick="filterCertificates('all', this)">Barchasi (All)</button>
+          <button class="cert-tab-btn" onclick="filterCertificates('national', this)">🇺🇿 Milliy Sertifikat (Ona tili)</button>
+          <button class="cert-tab-btn" onclick="filterCertificates('korean', this)">🇰🇷 Koreys tili (TOPIK)</button>
+          <button class="cert-tab-btn" onclick="filterCertificates('english', this)">🇬🇧/🇺🇸 Ingliz tili (IELTS/TOEFL)</button>
+          <button class="cert-tab-btn" onclick="filterCertificates('german', this)">🇩🇪 Nemis tili (TestDaF)</button>
+          <button class="cert-tab-btn" onclick="filterCertificates('japanese', this)">🇯🇵 Yapon tili (JLPT)</button>
+          <button class="cert-tab-btn" onclick="filterCertificates('turkish', this)">🇹🇷 Turk tili (TÖMER)</button>
+        </div>
+
+        <div class="certificates-grid" id="certificatesGrid">
+          <!-- JS orqali render qilinadi -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         QR Code & Mobile Access Section
+         ========================================================================== -->
+    <section class="qrcode-section" id="qrcode">
+      <div class="container">
+        <div class="qr-container-card">
+          <div class="qr-card-left">
+            <span class="qr-badge">📲 Tezkor Kirish & Mobil Ilova</span>
+            <h2 class="qr-title" data-i18n="qrTitle">GrantWay Mobil Versiyasi & Tezkor Kirish</h2>
+            <p class="qr-subtitle" data-i18n="qrSubtitle">
+              Telefoningiz kamerasini QR-kodga qarating va portalning barcha imkoniyatlaridan smartfoningizda to'liq foydalaning!
+            </p>
+
+            <ul class="qr-features-list">
+              <li>
+                <span class="qr-check-icon">✓</span>
+                <div>
+                  <strong>Istalgan joyda grant qidirish:</strong> Yo'lda, darsda yoki metroda grantlar bazasidan qulay foydalaning.
+                </div>
+              </li>
+              <li>
+                <span class="qr-check-icon">✓</span>
+                <div>
+                  <strong>Shaxsiy ariza rejasi sinxronizatsiyasi:</strong> Mobil qurilmangizda saqlangan grantlar va checklist doim yoningizda.
+                </div>
+              </li>
+              <li>
+                <span class="qr-check-icon">✓</span>
+                <div>
+                  <strong>18 ta tilda qulay interfeys:</strong> Telegram kabi qulay til almashish tajribasi.
+                </div>
+              </li>
+            </ul>
+
+            <div class="qr-actions-row">
+              <a href="https://grantway1.netlify.app/" target="_blank" rel="noopener noreferrer" class="btn btn-primary" data-i18n="qrOpenSite">
+                🌐 Saytga to'g'ridan-to'g'ri o'tish ↗
+              </a>
+              <button type="button" class="btn btn-outline" onclick="copyQrLink()" id="copyQrBtn">
+                📋 <span data-i18n="qrCopyLink">Havoladan nusxa olish</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="qr-card-right">
+            <div class="qr-image-wrapper">
+              <div class="qr-scan-line"></div>
+              <img src="assets/grantway-qr.png" alt="GrantWay Mobil QR Kod" class="qr-code-img" loading="lazy">
+              <div class="qr-url-pill">grantway1.netlify.app</div>
+            </div>
+            <p class="qr-hint">Kamerangizni ushbu QR-kodga qarating</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ==========================================================================
@@ -577,6 +667,71 @@
   </div>
 
   <!-- ==========================================================================
+       Certificate Detail Modal
+       ========================================================================== -->
+  <div class="grant-modal-overlay" id="certificateDetailModal">
+    <div class="grant-modal-box" style="max-width: 780px;">
+      <div class="grant-modal-header">
+        <div>
+          <div class="modal-country-badge">
+            <span id="certModalFlag" style="font-size: 1.4rem;"></span>
+            <span id="certModalBadge" class="font-semibold text-emerald"></span>
+          </div>
+          <h2 class="grant-modal-title" id="certModalTitle"></h2>
+          <div id="certModalOrg" style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;"></div>
+        </div>
+        <button class="btn-icon" onclick="closeCertificateModal()" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="grant-modal-body">
+        <!-- Overview -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>ℹ️</span> <span data-i18n="modalOverview">Umumiy tavsif va imtiyozlar</span>
+          </h3>
+          <p id="certModalDesc" style="color: var(--text-muted); line-height: 1.7;"></p>
+          <div style="margin-top: 0.75rem; font-size: 0.9rem; color: var(--primary);">
+            <strong>Darajalar / Ballar:</strong> <span id="certModalLevels" style="color: #fff;"></span>
+          </div>
+        </div>
+
+        <!-- Structure -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>📋</span> Imtihon strukturasi va bo'limlari
+          </h3>
+          <ul class="cert-modal-list" id="certModalStructureList"></ul>
+        </div>
+
+        <!-- Roadmap -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>🚀</span> Bosqichma-bosqich tayyorgarlik rejasi (Roadmap)
+          </h3>
+          <ul class="cert-modal-list" id="certModalRoadmapList"></ul>
+        </div>
+
+        <!-- Resources -->
+        <div>
+          <h3 class="modal-section-title">
+            <span>📚</span> Bepul rasmiy va tavsiya etilgan manbalar
+          </h3>
+          <ul class="cert-modal-list" id="certModalResourcesList"></ul>
+        </div>
+      </div>
+
+      <div class="grant-modal-footer">
+        <button class="btn btn-outline" onclick="closeCertificateModal()" data-i18n="closeModal">Yopish</button>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" id="certModalOfficialBtn">
+          Rasmiy ro'yxatdan o'tish portali ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
        Site Footer
        ========================================================================== -->
   <footer class="site-footer">
@@ -600,9 +755,11 @@
           <ul class="footer-links">
             <li><a href="#grants" data-i18n="navGrants">Grantlar</a></li>
             <li><a href="#universities" data-i18n="navUniversities">Universitetlar</a></li>
+            <li><a href="#certificates" data-i18n="navCertificates">Sertifikatlar</a></li>
             <li><a href="#planner" data-i18n="navPlanner">Ariza Rejasi</a></li>
             <li><a href="#matcher" data-i18n="navMatcher">Moslik Kalkulyatori</a></li>
             <li><a href="#guides" data-i18n="navGuides">Qo'llanmalar</a></li>
+            <li><a href="#qrcode" data-i18n="navQrCode">📱 Mobil QR</a></li>
           </ul>
         </div>
 
@@ -632,6 +789,7 @@
   <!-- Scripts -->
   <script src="js/translations.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/certificates.js"></script>
   <script src="js/language.js"></script>
   <script src="js/planner.js"></script>
   <script src="js/matcher.js"></script>

@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   renderScholarships();
   renderUniversities();
+  if (typeof renderCertificates === 'function') renderCertificates();
   renderPlanner();
   updatePlannerBadge();
 });
@@ -120,6 +121,7 @@ function setupEventListeners() {
       closeGrantModal();
       closeTelegramLangModal();
       closeGuideModal();
+      if (typeof closeCertificateModal === 'function') closeCertificateModal();
     }
   });
 }
@@ -652,5 +654,56 @@ function closeGuideModal() {
   if (modal) {
     modal.classList.remove('active');
     document.body.style.overflow = '';
+  }
+}
+
+// QR Kod havolasidan nusxa olish
+function copyQrLink() {
+  const url = "https://grantway1.netlify.app/";
+  const t = typeof getT === 'function' ? getT() : (translations[currentLang] || translations.uz);
+  const successMsg = t.qrCopied || "Havola nusxalandi: https://grantway1.netlify.app/";
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      showToast(successMsg, 'success');
+      updateCopyBtnFeedback();
+    }).catch(() => {
+      fallbackCopyText(url, successMsg);
+    });
+  } else {
+    fallbackCopyText(url, successMsg);
+  }
+}
+
+function fallbackCopyText(text, successMsg) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showToast(successMsg, 'success');
+    updateCopyBtnFeedback();
+  } catch (err) {
+    showToast(text, 'info');
+  }
+  document.body.removeChild(ta);
+}
+
+function updateCopyBtnFeedback() {
+  const btn = document.getElementById('copyQrBtn');
+  if (btn) {
+    const origHtml = btn.innerHTML;
+    const t = typeof getT === 'function' ? getT() : (translations[currentLang] || translations.uz);
+    btn.innerHTML = `✓ ${t.qrCopied || 'Nusxalandi!'}`;
+    btn.classList.add('btn-primary');
+    btn.classList.remove('btn-outline');
+    setTimeout(() => {
+      btn.innerHTML = origHtml;
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-outline');
+    }, 2500);
   }
 }
