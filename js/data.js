@@ -1239,7 +1239,7 @@ const universitiesData = [
     avgTuition: "£28,000 - £44,000 / yil",
     scholarshipsAvailable: ["Chevening", "Clarendon Fund", "Rhodes Scholarship"],
     website: "https://www.ox.ac.uk/",
-    image: "https://images.unsplash.com/photo-1548625361-12503521b949?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1612563958093-2c3bcfbd8760?auto=format&fit=crop&w=800&q=80",
     description: {
       uz: "Ingliz tilidagi dunyoning eng qadimiy va eng nufuzli tadqiqot universiteti.",
       en: "The oldest university in the English-speaking world and a world-leading center of learning.",
@@ -1293,7 +1293,7 @@ const universitiesData = [
     avgTuition: "$57,000 / yil (100% Need-based aid)",
     scholarshipsAvailable: ["Fulbright", "Harvard Need-Based Scholarship", "Boustany Foundation"],
     website: "https://www.harvard.edu/",
-    image: "https://images.unsplash.com/photo-1622397815608-207000dca449?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1622397333309-3056849bc70b?auto=format&fit=crop&w=800&q=80",
     description: {
       uz: "Dunyodagi eng boy ta'lim fondiga ega afsonaviy Ayvi Ligasi universiteti.",
       en: "Prestigious Ivy League research institution dedicated to excellence in teaching and research.",

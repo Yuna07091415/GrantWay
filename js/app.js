@@ -498,7 +498,7 @@ function renderUniversities(query = '') {
     html += `
       <div class="university-card animate-fade-in">
         <div class="uni-image-wrapper">
-          <img src="${uni.image}" alt="${uni.name}" class="uni-image" loading="lazy">
+          <img src="${uni.image}" alt="${uni.name}" class="uni-image" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80';">
           <span class="uni-ranking-badge">QS #${uni.qsRanking}</span>
         </div>
         <div class="uni-card-body">
